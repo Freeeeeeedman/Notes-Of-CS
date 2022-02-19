@@ -1,43 +1,25 @@
 #ifndef _TASK_
 #define _TASK_
-#include <iostream>
-/*
+
+
 class Circle
 {
     public:
-        //Circle();
-        //Circle(double,double);
-        Circle(double r=0,double x=0):radius(r),m_x(x){
-            std::cout<<"You creat a Circle"<<std::endl;
-        }
+  
+        Circle(double,double);
         double returnR()const;
         double returnX()const;    
         void setX(double&);
-        //static int returnNumOfCircle();
-        //~Circle();
+        static int returnNumOfCircle();
+        ~Circle();
     private:
         double radius;
         double m_x;
-        //static int numOfCircle;
+        static int numOfCircle;
     protected:
       
 
 };
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class IntArray
@@ -72,23 +54,6 @@ class IntArray
         int *mptr;
       
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif
