@@ -38,4 +38,21 @@ Circle::returnR()const{
     return radius;
 }
 
+class Student
+{
+    private:
+        double grade= 100;
+    friend void getInfo(Student&);
+    friend class Teacher;
+};
 
+inline void
+Teacher::getStudentInfo(const Student& st1)
+{
+    cout<<st1.grade<<endl;
+}
+
+void getInfo(Student& st1)
+{
+    cout<<st1.grade<<" from friend func"<<endl;
+}
