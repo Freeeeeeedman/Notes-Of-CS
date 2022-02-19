@@ -242,7 +242,6 @@
    - pure virtual函数:希望derived class一定要重新定义,它没有默认定义(实际可以有)
    - 继承搭配虚函数,template method,一般性动作写在framework框架,关键动作延缓到子类函数设计
 
-
 ####委托相关设计模式
 1. 同一文件多窗口:Observer
 2. filesystem:Composite
