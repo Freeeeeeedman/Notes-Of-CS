@@ -154,10 +154,25 @@ class Test
 };
 
 
+template <typename T,typename U> U tempFunc(T a,U b)
+{
+    cout<<a<<endl;
+    return b;
+}
 
+template<typename T,int num>
+class Array
+{
+    public:
+        Array(T data_=10):data(data_){cout<<data_<<endl;}
+        void show(const T );
+    private:
+        T data;
+        int data1;
+};
 
-
-
+template<typename T,int num>
+void Array<T,num>::show(const T data_){cout<<data_<<endl<<num<<endl;}
 
 
 

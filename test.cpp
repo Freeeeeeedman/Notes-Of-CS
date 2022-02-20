@@ -2,10 +2,10 @@
 #include "task.h"
 #include "task.cpp"
 using namespace std;
-void test1(),test2(),test3(),test4(),test5(),Print(const Base&,const int),test6(),test7();
+void test1(),test2(),test3(),test4(),test5(),Print(const Base&,const int),test6(),test7(),test8(),test9();
 int main()
 {
-   test6();
+   test9();
 
 
 }
@@ -65,4 +65,16 @@ void test6()
 void test7()
 {
     //Test test1;
+}
+
+void test8()
+{
+    tempFunc<double,int>(2.01,5.01);
+    tempFunc<int,double>(2.01,5.01);
+}
+
+void test9()
+{
+    Array<double,9>arr1;
+    arr1.show(100.01);
 }

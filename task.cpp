@@ -23,7 +23,7 @@ Circle::returnNumOfCircle()
     return numOfCircle;
 }
 
- double 
+double 
 Circle::returnX()const{
     return m_x;
 }
