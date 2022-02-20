@@ -2,7 +2,7 @@
 #include "task.h"
 #include "task.cpp"
 using namespace std;
-void test1(),test2(),test3(),test4(),test5(),Print(const Base&,const int),test6();
+void test1(),test2(),test3(),test4(),test5(),Print(const Base&,const int),test6(),test7();
 int main()
 {
    test6();
@@ -60,4 +60,9 @@ void test6()
 {
     Derive3 derive3;
     derive3.show(300);
+}
+
+void test7()
+{
+    //Test test1;
 }

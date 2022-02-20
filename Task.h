@@ -144,7 +144,14 @@ class Derive3:public Derive1,public Derive2
 };
 
 
-
+class Test
+{
+    public:
+        Test(int data_):data(data_){};
+        virtual void Draw()const=0;
+    private:
+        int data;
+};
 
 
 
