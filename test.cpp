@@ -1,11 +1,12 @@
 #include <iostream>
 #include "task.h"
 #include "task.cpp"
+#include "LinearList.h"
 using namespace std;
 void test1(),test2(),test3(),test4(),test5(),Print(const Base&,const int),test6(),test7(),test8(),test9();
 int main()
 {
-   test9();
+  
 
 
 }
