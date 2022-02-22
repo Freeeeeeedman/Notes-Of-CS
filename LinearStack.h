@@ -1,3 +1,5 @@
+#ifndef _LINEARSTACK_
+#define _LINEARSTACK_
 #include <iostream>
 using namespace std;
 
@@ -99,3 +101,7 @@ ostream& operator<<(ostream& out,LinearStack<T>& x)
     x.OutPut(out);
     return out;
 } 
+
+
+
+#endif
