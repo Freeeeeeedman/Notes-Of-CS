@@ -589,3 +589,40 @@ protect:
    - 注意声明友类模板类时不需要<T>,和普通声明模板类一样
    - Push()进栈时注意要先判断内存是否有空间，即新结点是否能new成功
    - 链接栈先输出栈顶，顺序栈先输出栈底
+9. 队列
+   - 定义
+     - 只允许在表的一端插入，另一端删除的线性表
+     - 入队，出队
+     - 队尾(rear)，队头(front)
+     - 先进先出(FIFO),后进后出(LILO)
+   - 抽象数据类型
+      ADR Queue{
+         D
+         R
+         P:
+            Create();
+            Destory();
+            bool IsEmpty();
+            bool IsFull();
+            bool Insert(const T& x);
+            bool GetElement(T& x);
+            bool Delete(T& x);
+            void OutPut();
+
+      }ADT Queue
+
+10. 顺序循环队列(LinearQueue)
+   - 需要头指针front,尾指针rear，两个整型变量
+   - 约定：front指向队头元素，rear指向队尾元素的下一位置，初始化队列front=0，rear=0
+   - 上溢，下溢
+   - 循环队列
+      - 假上溢
+         front=(front+1)%(MaxSize)
+         rear=(rear+1)%(MaxSize)
+      - 无法仅根据rear=front来判断队列是空还是满
+        - 少用一个元素空间。如队前若rear=(rear+1)%(MaxSize)则判断队列已满
+        - 使用size记录实际长度。则size=0时则队列是空队列
+
+11. 链接队列(LinkQueue)
+    - 仅在表头删除结点，在表位插入结点的单链表
+    - 对于链接队列,rear直接指向队尾
