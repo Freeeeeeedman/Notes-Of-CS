@@ -31,8 +31,8 @@ class LinkedBinTree
         LinkedBinTree();
         ~LinkedBinTree();
         bool IsEmpty();
-        LinkedNode<T>* CreateRoot(const T& x)
-        void clear();
+        LinkedNode<T>* CreateRoot(const T& x);
+        void Clear();
         LinkedNode<T>* GetRoot();
         LinkedNode<T>* InsertLeftChild(LinkedNode<T>* pNode,const T& x);
         LinkedNode<T>* InsertRightChild(LinkedNode<T>* pNode,const T& x);
@@ -47,6 +47,11 @@ class LinkedBinTree
         void InOrderTraverse();
         void PostOrderTraverse();
         void LevelOrderTraverse();
+        LinkedNode<T>* GetParent(LinkedNode<T>* pNode);
+        void DeleteSubTree(LinkedNode<T>* pNode);
+        void DeleteSubTreeNode(LinkedNode<T>* pNode);
+        LinkedNode<T>* SearchByKey(const T& x);
+
     private:
         LinkedNode<T>* m_pRoot;
 };
@@ -173,8 +178,141 @@ void LinkedBinTree<T>::InOrderTraverse(LinkedNode<T>* pNode)
     if(pNode==NULL)
         return;
     InOrderTraverse(pNode->m_pLeftChild);
-    cout<<
+    cout<<pNode->m_data<<" ";
+    InOrderTraverse(pNode->m_pRightChild);
 }
+
+
+template<class T>
+void LinkedBinTree<T>::PostOrderTraverse(LinkedNode<T>* pNode)
+{
+    if(pNode==NULL)
+        return;
+    InOrderTraverse(pNode->m_pLeftChild);
+    InOrderTraverse(pNode->m_pRightChild);
+    cout<<pNode->m_data<<" ";
+}
+
+template<class T>
+void LinkedBinTree<T>::LevelOrderTraverse()
+{
+    LinkQueue<LinkedNode<T>*>q;
+    LinkedNode<T>* pNode = NULL;
+    if(m_pRoot==NULL)
+        return;
+    q.Insert(m_pRoot);
+    while(!q.IsEmpty())
+    {
+        q.Delete(pNode);
+        cout<<pNode->m_data<<" ";
+        if(pNode->m_pLeftChild)
+            q.Insert(pNode->m_pLeftChild);
+        if(pNode->m_pRightChild)
+            q.Insert(pNode->m_pRightChild);        
+        
+    }
+}
+
+template<class T>
+LinkedNode<T>* LinkedBinTree<T>::GetParent(LinkedNode<T>* pNode)
+{
+    LinkQueue<LinkedNode<T>*>q;
+    LinkedNode<T>* pCurNode=NULL;
+    if(pNode==m_pRoot)
+        return NULL;
+    if(m_pRoot==NULL)
+        return NULL;
+    q.Insert(m_pRoot);
+    while(!q.IsEmpty())
+    {
+        q.Delete(pCurNode);
+        if(pCurNode->m_pLeftChild==pNode||pCurNode->m_pRightChild==pNode)
+            return pCurNode;
+        if(pCurNode->m_pLeftChild)
+            q.Insert(pCurNode->m_pLeftChild);
+        if(pCurNode->m_pRightChild)
+            q.Insert(pCurNode->m_pRightChild);
+    }
+    return NULL;
+}
+
+
+template<class T>
+void LinkedBinTree<T>::DeleteSubTree(LinkedNode<T>* pNode)
+{
+    LinkedNode<T>* pParentNode=NULL;
+    if(pNode==NULL)
+        return;
+    if(m_pRoot==NULL)
+        return;
+    else if((pParentNode=GetParent(pNode))!=NULL)
+    {
+        if(pParentNode->m_pLeftChild==pNode)
+            pParentNode->m_pLeftChild=NULL;
+        else
+            pParentNode->m_pRightChild=NULL;
+    }  
+    else 
+        return;
+    DeleteSubTreeNode(pNode);
+}
+
+template<class T>
+void LinkedBinTree<T>::DeleteSubTreeNode(LinkedNode<T>* pNode)
+{
+    LinkQueue<LinkedNode<T>*>q;
+    LinkedNode<T>* pCurNode=NULL;
+    if(pNode==NULL)
+        return;
+    q.Insert(pNode);
+    while(q.IsEmpty())
+    {
+        q.Delete(pCurNode);
+        if(pCurNode->m_pLeftChild)
+            q.Insert(pCurNode->m_pLeftChild);
+        if(pCurNode->m_pRightChild)
+            q.Insert(pCurNode->m_pRightChild);
+        delete pCurNode;
+
+    }
+
+}
+
+template<class T>
+LinkedNode<T>* LinkedBinTree<T>::SearchByKey(const T& x)
+{
+    LinkQueue<LinkedNode<T>*>q;
+    LinkedNode<T>* pMatchNode=NULL;
+    if(m_pRoot==NULL)
+        return NULL;
+    q.Insert(m_pRoot);
+    while(q.IsEmpty())
+    {
+        q.Delete(pMatchNode);
+        if(pMatchNode->m_data==x)
+            return pMatchNode;
+        if(pMatchNode->m_pLeftChild)
+            q.Insert(pMatchNode->m_pLeftChild);
+        if(pMatchNode->m_pRightChild)
+            q.Insert(pMatchNode->m_pRightChild);
+
+    }
+    return NULL;
+}
+
+template<class T>
+void LinkedBinTree<T>::Clear()
+{
+    DeleteSubTree(m_pRoot);
+}
+
+template<class T>
+LinkedBinTree<T>::~LinkedBinTree()
+{
+    Clear();
+}
+
+
 
 
 
