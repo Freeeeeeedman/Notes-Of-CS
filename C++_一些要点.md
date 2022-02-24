@@ -100,3 +100,4 @@
       我们不能将该操作符定义为类的成员，否则，左操作数就必须是该类类型的对象！
 11. LinkNode不需要写析构函数，但是要写友类
 12. 多个指针的声明:LinkNode<T>*front,**\*rear**;
+13. new有参数的类:m_pRoot=new LinkedNode<T>(x);
