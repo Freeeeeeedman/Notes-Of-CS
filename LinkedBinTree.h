@@ -312,6 +312,70 @@ LinkedBinTree<T>::~LinkedBinTree()
     Clear();
 }
 
+template<class T>
+void InsertBST(LinkedBinTree<T>& btree,T K)
+{
+    LinkedNode<T>* pNode=NULL,*pChild=NULL;
+    T x;
+    if(btree.IsEmpty())
+    {
+        btree.CreateRoot(K);
+        return;
+    }
+    pNode=btree.GetRoot;
+    while(pNode)
+    {
+        btree.GetNodeValue(pNode,x);
+        if(K == x)
+            return;
+        if(K < x)
+        {
+            if((pChild=btree.GetLeftChild(pNode))!=NULL)
+                pNode = pChild;
+            else
+            {
+                btree.InsertLeftChild(pNode,K);
+                return;
+            }
+        }
+        else
+        {
+            if((pChild=btree.GetRightChild(pNode))!=NULL)
+            pNode = pChild;
+            else
+            {
+                btree.InsertRightChild(pNode,K);
+                return;
+            }
+        }
+    }
+}
+
+template<class T>
+void CreateBST(T R[],int nSize,LinkedBinTree<T>& btree)
+{
+    for(int n=1;n<=nSize;n++)
+    {
+        InsertBST(btree,R[n]);
+    }
+
+}
+
+template<class T>
+LinkedNode<T>* SearchBST(LinkedNode<T>*pRoot,T K)
+{
+    LinkedBinTree<T>btree;
+    T x;
+    btree.GetNodeValue(pRoot,x);
+    if(K==x)
+        return pRoot;
+    else if(K<x)
+        return SearchBST(btree.GetLeftChild(pRoot),K);
+    else
+        return SearchBST(btree.GetRightChild(pRoot),K);
+}
+
+
 
 
 
