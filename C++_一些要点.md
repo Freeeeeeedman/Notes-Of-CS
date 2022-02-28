@@ -122,3 +122,9 @@
     - 逻辑判断:函数设计逻辑里有没有什么要求？
 16. 得到什么的函数返回可以是得到的值，也可以是bool值，看如何设计
 17. 取余对于循环的应用
+18. vector容器
+    - vector<int>v(5,10)
+    - for (int i = 0; i <= vec.size() - 1; i++){}当vec的size为0时，因为size（）函数的返回值是无符号整型，这时vec.size() - 1是一个正数，导致vec[i]的访问越界
+    - 分配在堆上，属于动态数组
+    - vector<vector<int>> res(n,vector<int>(n,0));
+19. int16,int32,int64
