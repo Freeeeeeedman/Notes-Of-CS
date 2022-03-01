@@ -128,3 +128,6 @@
     - 分配在堆上，属于动态数组
     - vector<vector<int>> res(n,vector<int>(n,0));
 19. int16,int32,int64
+20. 循环体内定义变量，while(){int a;},a的生命周期只有一次循环
+21. if else if else和if if else远远不同！
+22. C++返回数组用地址或者{1，2}，而不是[1,2]。{1，2}初始化数组或者vector数组
