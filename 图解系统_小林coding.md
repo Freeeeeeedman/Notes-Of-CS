@@ -139,8 +139,65 @@
    - 因为多个线程同时读写同⼀个 Cache Line 的不同变量时，⽽导致 CPU Cache 失效的现象
    - 对于多个线程共享的热点数据，即经常会修改的数据，应该避免这些数据刚好在同⼀个Cache Line
    - __cacheline_aligned_in_smp宏定义
-   - 避免 Cache 伪共享实际上是⽤空间换时间的思想，浪费⼀部分 Cache 空间，从⽽换来性能的提升
-   - 应用层面的规避方案: Java 并发框架 Disruptor 使⽤「字节填充 + 继承」
+   - Cache Line⼤⼩字节对⻬：避免 Cache 伪共享实际上是⽤空间换时间的思想，浪费⼀部分 Cache 空间，从⽽换来性能的提升
+   - 字节填充：应用层面的规避方案: Java 并发框架 Disruptor 使⽤「字节填充 + 继承」
 
 2. CPU如何选择线程
-   - 
+   - 进程和线程
+     - tark_struct
+         在 Linux 内核中，进程和线程都是⽤ tark_struct 结构体表示的
+     - 区别
+      在线程的 tark_struct 结构体⾥部分资源是共享了进程已创建的资源，⽐如内存地址空间、代码段、⽂件描述符等，所以Linux 中的线程也被称为轻量级进程
+     - 主线程
+      没有创建线程的进程，是只有单个执⾏流，被称为主线程
+   - 任务
+      Linux 内核⾥的调度器，调度的对象就是 tark_struct ，我们就把这个数据结构统称为任务
+     - 实时任务
+        对系统的响应时间要求很⾼，即优先级高，在0~99
+     - 普通任务
+        对系统的响应时间没有很高要求，优先级在100~139
+   - 调度类
+       确保高优先级的任务能够尽可能早的被执⾏
+     - Dealine调度类（实时任务）
+       - 调度器：Dealine调度器
+       - 运行队列：dl_rq
+       - 调度策略
+         SCHED_DEADLINE，距离当前时间点最近的 deadline 的任务会被优先调度
+     - Realtime调度类（实时任务）
+       - 调度器：RT调度器
+       - 运行队列：rt_rq
+       - 调度策略
+         SCHED_FIFO：相同优先级先来先服务，高优先级可以插队
+         SCHED_RR：对于相同优先级的任务，轮流着运⾏，每个任务都有⼀定的时间⽚，当⽤完时间⽚的任务会被放到队列尾部，以保证相同优先级任务的公平性，但高优先级仍可以插队
+     - Fair调度类（普通任务）日常遇到最多
+       - 调度器：CFS调度器
+       - 运行队列：cfs_rq
+       - 调度策略
+         SCHED_NORMAL：普通任务使⽤的调度策略；
+         SCHED_BATCH：后台任务的调度策略，不和终端进⾏交互，因此在不影响其他需要交互的任务，可以适当降低它的优先级
+   - 完全公平调度（Completely Fair Scheduling）
+     - 概念
+         分配给每个任务的 CPU 时间是⼀样，各任务安排一个虚拟运行时间vruntime
+         在 CFS 算法调度的时候，会优先选择 vruntime 少的任务，确保公平性
+     - 权重值
+         vruntime += 实际运行时间delta_exec *　NICE_0_LOAD　／　权重
+         高权重优先调度，nice越低权重越高
+   - 运⾏队列（Run Queue, rq）
+     - Deadline 运⾏队列 dl_rq
+     - 实时任务运⾏队列 rt_rq 
+     - CFS 运⾏队列 csf_rq(红黑树描述)
+     - 优先级： Deadline > Realtime > Fair,优先级如下： Deadline > Realtime > Fair
+   - 调整优先级
+     - 默认均为普通任务
+     - nice值
+         -20~19,表示优先级的修正数值
+          priority(new) = priority(old) + nice，值越低，表明优先级越⾼
+     - 设定启动任务nice值
+         nice -n -3 /usr.sbin/mysqld
+     - 修改运行任务nice值
+         renice -10 -p <pid>
+     - 修改调度策略及优先级
+         chrt -f 1 -p <pid>    
+      
+    
+      
