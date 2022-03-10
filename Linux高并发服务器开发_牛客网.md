@@ -358,5 +358,67 @@
          - S_IFIFO 0010000 管道
          - S_IFMT 0170000 掩码
      - (st_mode & S_IFMT) == S_IFREG，通过与宏&运算，再与对应文件类型宏进行比较得出其文件类型
-     - others文件权限也是通过与宏00007&运算得出，等待
- 
+     - others文件权限也是通过与宏00007&运算得出，等等
+
+#### 1.8 Linux 文件属性操作函数
+1. access()
+   - int access(const char *pathname, int mode);
+     - 作用：判断某个文件是否有某个权限，或者判断文件是否存在
+     - 参数：
+         - pathname: 判断的文件路径
+         - mode:
+                R_OK: 判断是否有读权限
+                W_OK: 判断是否有写权限
+                X_OK: 判断是否有执行权限
+                F_OK: 判断文件是否存在
+     - 返回值：成功返回0， 失败返回-1
+2. chmod()
+   -  int chmod(const char *pathname, mode_t mode);
+      - 修改文件的权限
+      -  参数：
+            - pathname: 需要修改的文件的路径
+            - mode:需要修改的权限值，八进制的数
+            - r:4,w:2,x:1
+      -  返回值：成功返回0，失败返回-1
+   - int chown(const char *path, uid_t owner, gid_t group);
+     - 修改文件的所有者和所有组
+     - uid:etc/passwd
+     - gid:etc/group
+   - useradd
+   - id ubuntu
+3. truncate()
+   - int truncate(const char *path, off_t length);
+     - 作用：缩减或者扩展文件的尺寸至指定的大小
+     - 参数：
+        - path: 需要修改的文件的路径
+        - length: 需要最终文件变成的大小
+     - 返回值：
+         成功返回0， 失败返回-1
+
+#### 1.9 Linux 目录操作函数
+1. mkdir()
+   - mkdir命令和mkdir函数不同
+   - int mkdir(const char *pathname, mode_t mode);
+       - 作用：创建一个目录
+       - 参数：
+            pathname: 创建的目录的路径
+            mode: 权限，八进制的数,会与掩码进行与操作
+       - 返回值：
+            成功返回0， 失败返回-1
+2. int rmdir(const char *path)
+   只能删除空目录
+3. int rename(const char *oldpath, const char *newpath)
+4. chdir()
+   - int chdir(const char *path);
+       - 作用：修改进程的工作目录
+            比如在/home/nowcoder 启动了一个可执行程序a.out, 进程的工作目录 /home/nowcoder
+       - 参数：
+            path : 需要修改的工作目录
+5. getcwd()
+   - char *getcwd(char *buf, size_t size);
+       - 作用：获取当前工作目录
+       - 参数：
+            - buf : 存储的路径，指向的是一个数组（传出参数）
+            - size: 数组的大小
+       - 返回值：
+            返回的指向的一块内存，这个数据就是第一个参数
