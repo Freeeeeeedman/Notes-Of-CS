@@ -240,24 +240,24 @@
 #### 1.6 文件描述符
 1. 文件描述符在内核区，由PCB进程控制块管理
 2. 文件描述符表
-  - 使用数组存取，为了一个进程可以同时打开多个文件
-  - 默认大小为1024，即最大同时可打开文件数目为1024
-  - 默认前三为标准输入0，标准输出1，标准错误2，默认为打开状态，与当前终端/dev/tty设备文件绑定
-  - 一个文件可以被打开多次，即多个文件描述符可以指定同一文件
-  - 每打开一个文件，则占用一个空闲的最小的文件描述符
+   - 使用数组存取，为了一个进程可以同时打开多个文件
+   - 默认大小为1024，即最大同时可打开文件数目为1024
+   - 默认前三为标准输入0，标准输出1，标准错误2，默认为打开状态，与当前终端/dev/tty设备文件绑定
+   - 一个文件可以被打开多次，即多个文件描述符可以指定同一文件
+   - 每打开一个文件，则占用一个空闲的最小的文件描述符
 
 #### 1.7 Linux I/O函数
 1. man 2 open:linux系统I/O函数
    man 3 fopen:标准C库函数
 2. open()
-  - int open(const char *pathname, int flags);
+   - int open(const char *pathname, int flags);
      - pathname:要打开的文件路径
      - flags：对文件的操作权限设置还要其他设置，互斥
      - 返回值：返回一个新的文件描述符，如果调用失败，返回-1
      - errno：属于linux系统函数库，是其中的一个全局变量，记录的是最近的错误号
-  - void perror(const char *s);作用：打印errno对应的错误描述
+   - void perror(const char *s);作用：打印errno对应的错误描述
       s参数：用户描述，比如hello,最终输出的内容是  hello:xxx(实际的错误描述)
-  - int open(const char *pathname, int flags, mode_t mode);
+   - int open(const char *pathname, int flags, mode_t mode);
      - 不是函数重载，C是用可变参数实现
      - flags：对文件的操作权限和其他的设置
        - 必选项：O_RDONLY,  O_WRONLY, O_RDWR  这三个之间是互斥的
@@ -273,6 +273,90 @@
         &   0775   ->   111111101
 
                         111111101
-        
-
-
+3. read()
+   - ssize_t read(int fd, void *buf, size_t count);
+     - 参数：
+       - fd：文件描述符，open得到的，通过这个文件描述符操作某个文件
+       - buf：需要读取数据存放的地方，数组的地址（传出参数）
+       - count：指定的数组的大小
+     - 返回值：
+        - 成功：
+           \>0: 返回实际的读取到的字节数
+           =0：文件已经读取完了
+        - 失败：-1 ，并且设置errno        
+4. write()
+    - ssize_t write(int fd, const void *buf, size_t count);
+       - 参数：
+            - fd：文件描述符，open得到的，通过这个文件描述符操作某个文件
+            - buf：要往磁盘写入的数据，数据
+            - count：要写的数据的实际的大小
+       - 返回值：
+            成功：实际写入的字节数
+            失败：返回-1，并设置errno
+5. lseek()
+   - off_t lseek(int fd, off_t offset, int whence);
+      -  参数：
+            - fd：文件描述符，通过open得到的，通过这个fd操作某个文件
+            - offset：偏移量
+            - whence:
+                SEEK_SET
+                    设置文件指针的偏移量
+                SEEK_CUR
+                    设置偏移量：当前位置 + 第二个参数offset的值
+                SEEK_END
+                    设置偏移量：文件大小 + 第二个参数offset的值
+      -  返回值：返回文件指针的位置
+     -   作用：
+        1. 移动文件指针到文件头,避免再次打开文件
+        lseek(fd, 0, SEEK_SET);
+        2. 获取当前文件指针的位置
+        lseek(fd, 0, SEEK_CUR);
+        3. 获取文件长度
+        lseek(fd, 0, SEEK_END);
+        4. 拓展文件的长度，当前文件10b, 110b, 增加了100个字节
+        lseek(fd, 100, SEEK_END)
+        注意：需要写一次数据， write(fd, " ", 1);
+        用途：先占据一部分空间
+6. stat()
+   - stat test.txt
+   - int stat(const char *pathname, struct stat *statbuf);
+      - 作用：获取一个文件相关的一些信息
+      - 参数:
+            - pathname：操作的文件的路径
+            - statbuf：结构体变量，传出参数，用于保存获取到的文件的信息
+      - 返回值：
+            成功：返回0
+            失败：返回-1 设置errno
+   - int lstat(const char *pathname, struct stat *statbuf);
+      - 作用：获取软链接而非其指向的文件的信息
+   -  ```
+      struct stat {
+          dev_t st_dev; // 文件的设备编号
+          ino_t st_ino; // 节点
+          mode_t st_mode; // 文件的类型和存取的权限
+          nlink_t st_nlink; // 连到该文件的硬连接数目
+          uid_t st_uid; // 用户ID
+          gid_t st_gid; // 组ID
+          dev_t st_rdev; // 设备文件的设备编号
+          off_t st_size; // 文件字节数(文件大小)
+          blksize_t st_blksize; // 块大小
+          blkcnt_t st_blocks; // 块数
+          time_t st_atime; // 最后一次访问时间
+          time_t st_mtime; // 最后一次修改时间
+          time_t st_ctime; // 最后一次改变时间(指属性)
+      };
+      ```
+   - st_mode变量
+     - 4位文件类型+3位特殊权限位+3位User权限位+3位Group权限位+3位Others权限位
+     - linux共七种文件
+         - S_IFSOCK 0140000 套接字
+         - S_IFLNK 0120000 符号链接（软链接）
+         - S_IFREG 0100000 普通文件
+         - S_IFBLK 0060000 块设备
+         - S_IFDIR 0040000 目录
+         - S_IFCHR 0020000 字符设备
+         - S_IFIFO 0010000 管道
+         - S_IFMT 0170000 掩码
+     - (st_mode & S_IFMT) == S_IFREG，通过与宏&运算，再与对应文件类型宏进行比较得出其文件类型
+     - others文件权限也是通过与宏00007&运算得出，等待
+ 
