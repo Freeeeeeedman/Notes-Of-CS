@@ -694,17 +694,17 @@
             只有当调用失败，才会有返回值，返回-1，并且设置errno
             如果调用成功，没有返回值。
 5. 其他函数
-- int execle(const char *path, const char *arg, .../*, (char *) NULL, char *
-const envp[] */);
-- int execv(const char *path, char *const argv[]);
-- int execvp(const char *file, char *const argv[]);
-- int execvpe(const char *file, char *const argv[], char *const envp[]);
-- int execve(const char *filename, char *const argv[], char *const envp[]);
-- 说明
-   l(list) 参数地址列表，以空指针结尾
-   v(vector) 存有各参数地址的指针数组的地址
-   p(path) 按 PATH 环境变量指定的目录搜索可执行文件
-   e(environment) 存有环境变量字符串地址的指针数组的地址，即自己指定的地址,char* test[]={"","",""};
+   - int execle(const char *path, const char *arg, .../*, (char *) NULL, char *
+   const envp[] */);
+   - int execv(const char *path, char *const argv[]);
+   - int execvp(const char *file, char *const argv[]);
+   - int execvpe(const char *file, char *const argv[], char *const envp[]);
+   - int execve(const char *filename, char *const argv[], char *const envp[]);
+   - 说明
+      l(list) 参数地址列表，以空指针结尾
+      v(vector) 存有各参数地址的指针数组的地址
+      p(path) 按 PATH 环境变量指定的目录搜索可执行文件
+      e(environment) 存有环境变量字符串地址的指针数组的地址，即自己指定的地址,char* test[]={"","",""};
 
 #### 2.6 进程控制
 1. 进程退出
@@ -722,10 +722,42 @@ const envp[] */);
    - 每当出现一个孤儿进程的时候，内核就把孤儿进程的父进程设置为 init（pid == 1） ，而 init进程会循环地 wait() 它的已经退出的子进程。最后由init进程回收孤儿进程的资源。
    - 孤儿资源没有危害
    - 例
-      终端为a进程的父进程，a进程运行时，终端进程切换到后台，a进程运行结束，终端进程切换到前台。但是如果a进程的子进程还在运行，则仍会输出到屏幕上，因为子进程复制了a进程的文件描述符表
+      终端为a进程的父进程，a进程运行时，终端进程切换到后台，a进程运行结束，终端进程切换到前台（因为是a的父进程，知道a已结束）。但是如果a进程的子进程还在运行，则仍会输出到屏幕上，因为子进程复制了a进程的文件描述符表
 3. 僵尸进程
-   - 每个进程结束之后, 都会释放自己地址空间中的用户区数据，内核区的 PCB 没有办法自己释放掉，需要父进程去释放
+   - 每个进程结束之后, 都会释放自己地址空间中的用户区数据，但内核区的 PCB 没有办法自己释放掉，需要父进程去释放
    - 进程终止时，父进程尚未回收，子进程残留资源（PCB）存放于内核中，变成僵尸（Zombie）进程
    - 僵尸进程不能被 kill -9 杀死，这样就会导致一个问题，如果父进程不调用 wait()或 waitpid() 的话，那么保留的那段信息就不会释放，其进程号就会一直被占用，但是系统所能使用的进程号是有限的，如果大量的产生僵尸进程，将因为没有可用的进程号而导致系统不能产生新的进程，此即为僵尸进程的危害，应当避免
-   - 结束僵尸进程需要结束父进程可以用ctrl+c但不方便，所以一般让父进程调用wait()或waitpid()
-4. 
+   - 结束僵尸进程需要结束父进程让进程为1的进程托管，可以用ctrl+c但不方便，所以一般让父进程调用wait()或waitpid()
+4. 进程回收
+   - 在每个进程退出的时候，内核释放该进程所有的资源、包括打开的文件、占用的内存等。但是仍然为其保留一定的信息，这些信息主要主要指进程控制块PCB的信息（包括进程号、退出状态、运行时间等）。
+   - 父进程可以通过调用wait或waitpid得到它的退出状态同时彻底清除掉这个进程
+   - wait() 和 waitpid() 函数的功能一样，区别在于， wait() 函数会阻塞，waitpid() 可以设置不阻塞， waitpid() 还可以指定等待哪个子进程结束。
+   - 注意：一次wait或waitpid调用只能清理一个子进程，清理多个子进程应使用循环。
+5. wait()
+   - pid_t wait(int *wstatus);
+      - 功能：等待任意一个子进程结束，如果任意一个子进程结束了，此函数会回收子进程的资源。
+      - 参数：int *wstatus
+            进程退出时的状态信息，传入的是一个int类型的地址，传出参数。
+      - 返回值：
+            - 成功：返回被回收的子进程的id
+            - 失败：-1 (所有的子进程都结束，调用函数失败)
+   - 调用wait函数的进程会被挂起（阻塞），直到它的一个子进程退出或者收到一个不能被忽略的信号时才被唤醒（相当于继续往下执行）如果没有子进程了，函数立刻返回，返回-1；如果子进程都已经结束了，也会立即返回，返回-1
+   - status
+     - WIFEXITED(status) 非0，进程正常退出
+     - WEXITSTATUS(status) 如果上宏为真，获取进程退出的状态（exit的参数）
+     - WIFSIGNALED(status) 非0，进程异常终止
+     - WTERMSIG(status) 如果上宏为真，获取使进程终止的信号编号
+     - WIFSTOPPED(status) 非0，进程处于暂停状态
+     - WSTOPSIG(status) 如果上宏为真，获取使进程暂停的信号的编号
+     - WIFCONTINUED(status) 非0，进程暂停后已经继续运行
+
+6. 通过循环建立多个进程
+``` 
+    pid_t pid;
+    for(int i = 0; i < 5; i++) {
+        pid = fork();
+        if(pid == 0) {
+            break; //否则将嵌套建立一共 5 + 4 + 3 + 2 + 1 个进程
+        }
+    }
+```
