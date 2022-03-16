@@ -146,3 +146,13 @@
 - s.reverse(,),反转在[first，last)范围内的顺序，不包括last
 - s.end()，指向最后一个元素的下一个位置
 
+### 25.sizeof(),strlen()
+- sizeof()是运算符，在头文件的类型为unsigned int,其运算值在编译时就计算好了，参数可以是指针、数组、类型、对象和函数等；不能用于new出来的地址
+- strlen()是函数，要在运行时才能计算。参数必须是字符型指针（char*）。当数组名作为参数传入时，实际上数组就退化为指针了。该函数完成的功能是从代表该字符串的第一个地址开始遍历的，直到遇到结束符NULL。返回的长度大小不包括NULL。
+- char str[20] = "0123456789";
+    int a = strlen(str);
+    int b = sizeof(str);
+    这时的 a = 10,b = 20;因为strlen计算的是字符串的长度，以’\0’为字符串结束标志；而sizeof计算的是分配的数组str[20]所占的内存空间的大小（char类型为1所以可以用来计数），不受里面存储的内容影响
+- 注意如果时 char* arr = "abc";sizeof(arr)返回的是指针的大小（64位为8）;strlen(arr)返回的才是字符串实际长度
+- 注意char arr[] = "abc";sizeof返回4，strlen()返回3
+- 但对于char arr[3] = "abc"；两者都返回3
