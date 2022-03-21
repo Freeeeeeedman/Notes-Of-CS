@@ -739,7 +739,7 @@
    - pid_t wait(int *wstatus);
       - 功能：等待任意一个子进程结束，如果任意一个子进程结束了，此函数会回收子进程的资源。
       - 参数：int *wstatus
-            进程退出时的状态信息，传入的是一个int类型的地址，传出参数。**注意由于是传出参数，所以实际写程序时，写得是对应的引用**
+            进程退出时的状态信息，传入的是一个int类型的地址，传出参数。**注意由于是传出参数，所以实际写程序时，写得是对应的地址**
       - 返回值：
             - 成功：返回被回收的子进程的id
             - 失败：-1 (所有的子进程都结束，调用函数失败)
@@ -915,7 +915,7 @@ pid_t waitpid(pid_t pid, int *wstatus, int options);
    - 将硬盘文件映射到两个进程的虚拟空间中，修改即同步，即完成进程间通信
    - 可实现有关系的进程映射（匿名映射），没关系的进程映射（文件映射）
 4. mmap()
-void *mmap(void *addr, size_t length, int prot, int flags,int fd, off_t offset);
+void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
    - 功能：将一个文件或者设备的数据映射到内存中
    - 参数：
        - void *addr: NULL, 由内核指定
