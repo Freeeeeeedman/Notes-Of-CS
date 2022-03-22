@@ -1087,3 +1087,66 @@ int raise(int sig);
 void abort(void);
    - 功能： 发送SIGABRT信号给当前的进程，杀死当前进程
         kill(getpid(), SIGABRT);
+4. alarm()
+   unsigned int alarm(unsigned int seconds);
+   - 功能：设置定时器（闹钟）。函数调用，开始倒计时，当倒计时为0的时候，
+                函数会给当前的进程发送一个信号：SIGALARM
+   - 参数：
+      seconds: 倒计时的时长，单位：秒。如果参数为0，定时器无效（不进行倒计时，不发信号）。
+               取消一个定时器，通过alarm(0)。
+   - 返回值：
+      - 之前没有定时器，返回0
+      - 之前有定时器，返回之前的定时器剩余的时间
+   - SIGALARM ：默认终止当前的进程，每一个进程都有且只有唯一的一个定时器,会覆盖之前的定时器
+        alarm(10);  -> 返回0
+        过了1秒
+        alarm(5);   -> 返回9
+   - alarm(100) -> 该函数是不阻塞的
+   - alarm时间 = 用户时间 + 内核时间 (即在用户态和内核态的时间)
+      - 实际的时间 = 内核时间(系统调用时间) + 用户时间(普通代码执行时间) + 消耗的时间(操作IO等消耗的时间)
+      - 定时器，与进程的状态无关（自然定时法）。无论进程处于什么状态(如sleep阻塞)，alarm都会计时
+      - 例：printf()到终端和直接重定向，输出的数字后者多很多
+5. setitimer()
+int setitimer(int which, const struct itimerval *new_value,struct itimerval *old_value);
+   - 功能：设置定时器（闹钟）。可以替代alarm函数。精度微秒us，可以实现周期性定时
+   - 参数：
+      - which : 定时器以什么时间计时
+              ITIMER_REAL: 真实时间，时间到达，发送 SIGALRM   **常用**
+              ITIMER_VIRTUAL: 用户时间，时间到达，发送 SIGVTALRM
+              ITIMER_PROF: 以该进程在用户态和内核态下所消耗的时间来计算，时间到达，发送 SIGPROF
+
+      - new_value: 设置定时器的属性
+
+                struct itimerval {      // 定时器的结构体
+                struct timeval it_interval;  // 每个阶段的时间，间隔时间
+                struct timeval it_value;     // 延迟多长时间执行定时器,即第一次发送信号
+                };
+
+                struct timeval {        // 时间的结构体
+                    time_t      tv_sec;     //  秒数     
+                    suseconds_t tv_usec;    //  微秒    
+                };
+      - old_value ：记录上一次的定时的时间参数，一般不使用，指定NULL 
+   - 也是非阻塞的
+   - 返回值：
+            成功 0
+            失败 -1 并设置错误号
+6. signal()
+sighandler_t signal(int signum, sighandler_t handler);
+   - 功能：设置某个信号的捕捉行为
+   - 参数：
+      - signum: 要捕捉的信号
+      - handler: 捕捉到信号要如何处理
+            - SIG_IGN ： 忽略信号
+            - SIG_DFL ： 使用信号默认的行为
+            - 回调函数
+               - typedef void (*sighandler_t)(int);函数指针, int类型的参数表示捕捉到的信号的值
+               - 这个函数是**内核调用**，程序员只负责写，捕捉到信号后如何去处理信号。
+               - 需要程序员实现，提前准备好的，函数的类型根据实际需求，看函数指针的定义
+               - 不是程序员调用，而是当信号产生，由内核调用
+               - 函数指针是实现回调的手段，函数实现之后，将函数名(即函数的地址)放到函数指针的位置就可以了。
+   - 返回值：
+      成功，返回上一次注册的信号处理函数的地址。第一次调用返回NULL
+      失败，返回SIG_ERR，设置错误号
+   - 先要注册信号捕捉,再产生信号
+   - SIGKILL SIGSTOP不能被捕捉，不能被忽略。例:防止病毒程序
