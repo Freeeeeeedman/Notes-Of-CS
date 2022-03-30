@@ -1,6 +1,6 @@
 {
     "configurations": [
-        {   "gitlens.currentLine.enabled":false,
+        {   
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**"
