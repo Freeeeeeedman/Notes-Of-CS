@@ -1207,7 +1207,7 @@ sighandler_t signal(int signum, sighandler_t handler);
          1 ： signum被阻塞
          0 ： signum不阻塞
          -1 ： 失败
-5. 内核信号集函数(是系统调用函数)
+6. 内核信号集函数(是系统调用函数)
    - int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
      - 功能：将自定义信号集中的数据设置到内核中（设置阻塞，解除阻塞，替换）
      - 参数：
@@ -1225,7 +1225,7 @@ sighandler_t signal(int signum, sighandler_t handler);
    - int sigpending(sigset_t *set);
      - 功能：获取内核中的**未决信号集**
      - 参数：set,传出参数，保存的是内核中的未决信号集中的信息。
-6. 第二个信号捕捉函数
+7. 第二个信号捕捉函数
    - int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
       - 是系统调用函数
       - 功能：检查或者改变信号的处理。信号捕捉
@@ -1251,18 +1251,18 @@ struct sigaction {
    void     (*sa_restorer)(void);
 };
 ```
-7. 内核实现信号捕捉的过程
+8. 内核实现信号捕捉的过程
    1. 在执行主控制流程的某条指令时因为中断、异常或系统调用进入内核
    2. 内核处理完异常准备回用户模式之前先处理当前进程中可以递送的信号
    3. 如果信号的处理动作为自定义的信号处理函数，则回到用户模式执行信号处理函数（而不是回到主控制流程）
    4. 信号处理函数返回时执行特殊的系统调用sigreturn再次进入内核
    5. 返回用户模式从主控制流程中上次被中断的地方继续向下执行
-8. 一些注意事项
+9. 一些注意事项
    - 尽量避免使用signal（不同的标准可能形式不一样），尽量使用sigaction
    - 如果信号处理函数正在处理第一个SIGALRM信号，然后又来了SIGALRM一个信号，后来的SIGALRM信号会默认被屏蔽，只有等前一个回调函数执行完，才会执行下一个回调函数
    - 执行信号捕捉函数时用的临时信号集，回调完后会切换到内核系统的阻塞信号集。也就说有两种对信号的处理方式，一种是sigprocmask处理的内核的阻塞信号集，还有一种是sigaction的临时信号集的处理。
    - 常规信号不支持排队，未决信号集只能标记一次的状态，即只能记录一个信号是否是未决，当其中某个信号被阻塞时，后面如果又来了相同的信号，它们都会被丢弃（其他序号32后面的支持排队）
-9. SIGCHLD信号
+10. SIGCHLD信号
     - SIGCHLD信号产生的3个条件：
       1. 子进程结束
       2. 子进程暂停了
@@ -1387,7 +1387,7 @@ struct sigaction {
       - 共享内存：进程退出，共享内存还在，标记删除（所有的关联的进程数为0），或者关机。
          如果一个进程退出，会**自动**和共享内存进行取消关联。
 
-7. 终端查看进程间通信信息命令
+8. 终端查看进程间通信信息命令
    - ipcs 用法
      - ipcs -a // 打印当前系统中所有的进程间通信方式的信息
      - ipcs -m // 打印出使用共享内存进行进程间通信的信息
@@ -1441,7 +1441,7 @@ struct sigaction {
 7. 守护进程的创建步骤
    - 执行一个 fork()，之后父进程退出，子进程继续执行。
        - 防止父进程结束后显示shell提示符
-       - 确保子进程不会是进程组的首进程，才能成功调用setsid()。不能是进程组的首进程创建会话。例如如果父进程PID = PGID = 100，其通过setsid()创建新会话，那么在新会话中也会有同样名称进程组SID = PGID = 100，产生冲突。而通过子进程PID = 101,产生会话SID = PGID = 101则没有冲突
+       - 不能是进程组的首进程创建会话。例如如果父进程PID = PGID = 100，其通过setsid()创建新会话，那么在新会话中也会有同样名称进程组SID = PGID = 100，产生冲突。而通过子进程PID = 101,产生会话SID = PGID = 101则没有冲突
    - 子进程调用 setsid() 开启一个新会话。
        - 创建的新会话没有控制终端，就可以防止键盘产生一些信号杀死这个终端（但是还是能通过kill杀死）
        - 但是还是有终端的，只是这个终端设备没办法通过shell控制进程再控制该进程，但该进程可以通过标准输出向其输出
@@ -1535,7 +1535,7 @@ int pthread_join(pthread_t thread, void **retval);
             一般在主线程中使用
    - 参数：
       - thread：需要回收的子线程的ID
-      - retval: 接收子线程退出时的返回值,为二级指针，因为是传出参数，要改变原值必须再取地址。至于为什么子线程返回值为void*因为传递地址块，当使用自定义结构的时候尤其如此。
+      - retval: 接收子线程退出时的返回值,为二级指针，因为是传出参数，要改变原值必须再取地址。至于为什么子线程返回值为void*因为传递地址效率高，当使用自定义结构的时候尤其如此。
       ```
       int * thread_retval;
       ret = pthread_join(tid, (void **)&thread_retval);
@@ -1558,4 +1558,18 @@ int pthread_cancel(pthread_t thread);
    - 可以在创建线程的时候设置其属性，设置可以取消还是不能取消
    - 取消某个线程，可以终止某个线程的运行，但是并不是立马终止，而是当子线程执行到一个取消点，线程才会终止。
    - 取消点：系统规定好的一些系统调用，我们可以粗略的理解为从用户区到内核区的切换，这个位置称之为取消点。
-
+11. 线程属性
+    - 注意
+      - 通过创建线程时，传入线程的属性来时其结束后自动分离
+      - 获得线程属性要在其创建完之后
+      - 最后记得要销毁线程属性变量
+    - 初始化线程属性变量
+    int pthread_attr_init(pthread_attr_t *attr);
+    比如说设置栈空间的大小
+    - 释放线程属性的资源
+    int pthread_attr_destroy(pthread_attr_t *attr);     
+    - 获取线程分离的状态属性
+    int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate); 
+    - 设置线程分离的状态属性
+    int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
+       
