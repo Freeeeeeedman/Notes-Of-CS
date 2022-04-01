@@ -1,13 +1,24 @@
 
 [toc]
-
+### 0. 一些重点
+1. 静态库，动态库区别，加载失败怎么办
+2. GDB多进程多线程调试
+3. 虚拟地址空间
+4. 文件描述符
+5. 系统函数查man API
+6. 进程状态转换
+7. 进程创建
+8. exec函数族
+9. 孤儿进程僵尸进程弊端解决方法
+10. 进程间通信方式，原理，实现流程
+11. 信号：定时器，信号捕捉
+12. 守护进程概念，实现步骤
+13. 多线程API
+14. 线程和进程区别
+15. 线程同步的几种方式
+16. 生产者消费者模型
+17. IO多路转换一定会问
 ### 1. Linux系统编程入门
-
-
-
-
-
-
 #### 1.1 Linux开发环境搭建
 1. 免登录VSCode
     本地端: ssh-keygen
@@ -242,7 +253,7 @@
     代码段，二进制机器命令
   - 受保护的地址
 
-#### 1.6 文件描述符
+#### 1.7 文件描述符
 1. 文件描述符在内核区，由PCB进程控制块管理
 2. 文件描述符表
    - 使用数组存取，为了一个进程可以同时打开多个文件
@@ -251,7 +262,7 @@
    - 一个文件可以被打开多次，即多个文件描述符可以指定同一文件
    - 每打开一个文件，则占用一个空闲的最小的文件描述符
 
-#### 1.7 Linux I/O函数
+#### 1.8 Linux I/O函数
 1. man 2 open:linux系统I/O函数
    man 3 fopen:标准C库函数
 2. open()
@@ -367,7 +378,7 @@
 7. sizeof()和strlen()在write()中的区别
    - write(fd, buf, strlen(buf));向文件中写入内容的是，只会把缓冲区中的有效内容全部拷贝到文件中。
    - write(fd, buf, sizeof(buf));会把缓冲区中的所有数据拷贝到文件中
-#### 1.8 Linux 文件属性操作函数
+#### 1.9 Linux 文件属性操作函数
 1. access()
    - int access(const char *pathname, int mode);
      - 作用：判断某个文件是否有某个权限，或者判断文件是否存在
@@ -402,7 +413,7 @@
      - 返回值：
          成功返回0， 失败返回-1
 
-#### 1.9 Linux 目录操作函数
+#### 1.10 Linux 目录操作函数
 1. mkdir()
    - mkdir命令和mkdir函数不同
    - int mkdir(const char *pathname, mode_t mode);
@@ -431,7 +442,7 @@
             返回的指向的一块内存，这个数据就是第一个参数
 <<<<<<< HEAD
 
-#### 1.10 Linux目录遍历函数
+#### 1.11 Linux 目录遍历函数
 1. opendir()
    - 流stream
       一切能被读写的都是文件，流是读写文件的抽象
@@ -474,7 +485,7 @@
      ``` 
 3. int closedir(DIR *dirp);
 
-#### 1.11 dup,dup2,fcntl函数
+#### 1.12 dup,dup2,fcntl函数
 1. dup()
    - int dup(int oldfd);
       - 作用：复制一个新的文件描述符
@@ -1545,7 +1556,7 @@ int pthread_join(pthread_t thread, void **retval);
       非0 : 失败，返回的错误号
 9. 分离线程（自动回收线程资源）
 int pthread_detach(pthread_t thread);
-   - 功能：分离一个线程。被分离的线程**在终止的时候**，会自动释放资源返回给系统。
+   - 功能：分离一个线程。被分离的线程**在终止的时候**，会自动释放资源返回给系统，不需要主线程回收。
       1.不能多次分离，会产生不可预料的行为。
       2.不能去连接一个已经分离的线程，会报错。
    - 参数：需要分离的线程的ID
@@ -1651,3 +1662,85 @@ int pthread_cancel(pthread_t thread);
 3. 如何解决
    - 互斥量
    - 条件变量和信号量
+
+#### 3.7 条件变量
+1. 如果使用while if else判断一直是否有数据会导致子进程空转，浪费CPU资源
+2. 条件变量
+   - 条件变量的类型 pthread_cond_t
+   - int pthread_cond_init(pthread_cond_t *restrict cond, const pthread_condattr_t *restrict attr);
+   - int pthread_cond_destroy(pthread_cond_t *cond);
+   - int pthread_cond_wait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex);
+      - 等待，调用了该函数，线程会阻塞。
+   - int pthread_cond_timedwait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex, const struct  timespec *restrict abstime);
+      - 等待多长时间，调用了这个函数，线程会阻塞，直到指定的时间结束。
+   - int pthread_cond_signal(pthread_cond_t *cond);
+      - 唤醒一个或者多个等待的线程
+   - int pthread_cond_broadcast(pthread_cond_t *cond);
+      - 唤醒所有的等待的线程
+3. 条件变量不是锁，当满足某个条件时，条件变量可以阻塞线程或者解除阻塞。解决不了线程同步问题。
+4. pthread_cond_wait(&cond, &mutex); 阻塞时会对当前互斥锁解锁，解除阻塞时会对当前互斥锁加锁
+
+#### 3.8 信号量（信号灯）
+1. 作用和条件变量一直，都是控制阻塞，解决不了线程同步问题
+2. 信号量
+   - 信号量的类型 sem_t
+   - int sem_init(sem_t *sem, int pshared, unsigned int value);
+      - 初始化信号量
+      - 参数：
+         - sem : 信号量变量的地址
+         - pshared : 0 用在线程间 ，非0 用在进程间  **实际进程间同步方式也就是上述这些**
+         - value : 信号量中的值
+   - int sem_destroy(sem_t *sem);
+      - 释放资源
+   - int sem_wait(sem_t *sem);
+      - 对信号量加锁，调用一次对信号量的值-1，如果值为0，就阻塞
+   - int sem_trywait(sem_t *sem);
+   - int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);
+   - int sem_post(sem_t *sem);
+      - 对信号量解锁，调用一次对信号量的值+1
+      - 被wait阻塞的线程会被唤醒
+   - int sem_getvalue(sem_t *sem, int *sval);
+3. 生产者和消费者模型
+   ```
+    sem_t csem;
+    init(psem, 0, 8);
+    init(csem, 0, 0);  
+
+    producer() {
+        sem_wait(&psem);     //控制生成的数目上限
+        sem_post(&csem);
+    }
+
+    customer() {
+        sem_wait(&csem);
+        sem_post(&psem);
+    }
+   ```
+
+
+### 4. Linux网络编程
+
+#### 4.1 网络结构模式
+1. C/S结构
+   - 简介
+     - 服务器 - 客户机，即 Client - Server（C/S）结构。C/S 结构通常采取两层结构。服务器负责数据的管理，客户机负责完成与用户的交互任务。客户机是因特网上访问别人信息的机器，服务器则是提供信息供人访问的计算机。
+     - 客户机通过局域网与服务器相连，接受用户的请求，并通过网络向服务器提出请求，对数据库进行操作。服务器接受客户机的请求，将数据提交给客户机，客户机将数据进行计算并将结果呈现给用户。服务器还要提供完善安全保护及对数据完整性的处理等操作，并允许多个客户机同时访问服务器，这就对服务器的硬件处理数据能力提出了很高的要求。
+     - 在C/S结构中，应用程序分为两部分：服务器部分和客户机部分。服务器部分是多个用户共享的信息与功能，执行后台服务，如控制共享数据库的操作等；客户机部分为用户所专有，负责执行前台功能，在出错提示、在线帮助等方面都有强大的功能，并且可以在子程序间自由切换
+   - 优点
+     1. 能充分发挥客户端 PC 的处理能力，很多工作可以在客户端处理后再提交给服务器，所以 C/S 结构客户端响应速度快；
+     2. 操作界面漂亮、形式多样，可以充分满足客户自身的个性化要求；
+     3. C/S 结构的管理信息系统具有较强的事务处理能力，能实现复杂的业务流程；
+     4. 安全性较高，C/S 一般面向相对固定的用户群，程序更加注重流程，它可以对权限进行多层次校验，提供了更安全的存取模式，对信息安全的控制能力很强，一般高度机密的信息系统采用 C/S 结构适宜。
+   - 缺点
+     1. 客户端需要安装专用的客户端软件。首先涉及到安装的工作量，其次任何一台电脑出问题，如病毒、硬件损坏，都需要进行安装或维护。系统软件升级时，每一台客户机需要重新安装，其维护和升级成本非常高；
+     2. 对客户端的操作系统一般也会有限制，不能够跨平台。
+2. B/S结构
+   - 简介
+     - B/S 结构（Browser/Server，浏览器/服务器模式），是 WEB 兴起后的一种网络结构模式，WEB浏览器是客户端最主要的应用软件。这种模式统一了客户端，将系统功能实现的核心部分集中到服务器上，简化了系统的开发、维护和使用。客户机上只要安装一个浏览器，如 Firefox 或 InternetExplorer，服务器安装 SQL Server、Oracle、MySQL 等数据库。浏览器通过 Web Server 同数据库进行数据交互。
+   - 优点
+      - B/S 架构最大的优点是总体拥有成本低、维护方便、 分布性强、开发简单，可以不用安装任何专门的软件就能实现在任何地方进行操作，客户端零维护，系统的扩展非常容易，只要有一台能上网的电脑就能使用。
+   - 缺点
+      1. 通信开销大、系统和数据的安全性较难保障;
+      2. 个性特点明显降低，无法实现具有个性化的功能要求；
+      3. 协议一般是固定的：http/https,无法操作大数据量数据
+      4. 客户端服务器端的交互是请求-响应模式，通常动态刷新页面，响应速度明显降低
