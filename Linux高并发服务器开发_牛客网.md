@@ -1909,3 +1909,44 @@ int pthread_cancel(pthread_t thread);
       uint32_t htonl(uint32_t hostlong);		// 主机字节序 - 网络字节序
       uint32_t ntohl(uint32_t netlong);		// 主机字节序 - 网络字节序
      ```
+4. socket 地址
+   - 定义
+      socket地址其实是一个结构体，封装端口号和IP等信息。后面的socket相关的api中需要使用到这个socket地址。
+   - 通用 socket 地址
+     - struct sockaddr：IPV4
+     - struct sockaddr_storage: IPV6
+     - 比较麻烦，一般不用通用socket地址
+   ```
+      #include <bits/socket.h>
+      struct sockaddr {
+         sa_family_t sa_family; //协议族
+         char sa_data[14];      //具体数据：16位端口，32位IP地址
+      };
+      typedef unsigned short int sa_family_t;
+   ```
+   - 专用 socket 地址
+     - struct sockaddr_in
+     - struct sokaddr_un
+     - struct sokaddr_in6
+   - 所有专用 socket 地址（以及 sockaddr_storage）类型的变量在实际使用时都需要转化为通用 socket 地址类型 sockaddr（强制转化即可），因为所有 socket 编程接口使用的地址参数类型都是 sockaddr。为的是向前兼容，传递地址。
+5.  IP地址转换函数（字符串ip-整数 ，主机、网络字节序的转换
+    - ```
+      #include <arpa/inet.h>
+      // p:点分十进制的IP字符串，n:表示network，网络字节序的整数
+      int inet_pton(int af, const char *src, void *dst);
+      af:地址族： AF_INET AF_INET6
+      src:需要转换的点分十进制的IP字符串
+      dst:转换后的结果保存在这个里面
+      // 将网络字节序的整数，转换成点分十进制的IP地址字符串
+      const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
+      af:地址族： AF_INET AF_INET6
+      src: 要转换的ip的整数的地址
+      dst: 转换成IP地址字符串保存的地方
+      size：第三个参数的大小（数组的大小）
+      返回值：返回转换后的数据的地址（字符串），和 dst 是一样的
+      ```
+    - 按位取数据
+      ```
+      unsigned char * p = (unsigned char *)&num;
+      printf("%d %d %d %d\n", *p, *(p + 1), *(p + 2), *(p + 3));
+      ```
