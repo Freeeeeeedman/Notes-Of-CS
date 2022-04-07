@@ -1928,14 +1928,25 @@ int pthread_cancel(pthread_t thread);
      - struct sockaddr_in
      - struct sokaddr_un
      - struct sokaddr_in6
+     ```
+     #include <netinet/in.h>
+      struct sockaddr_in{
+         sa_family_t sin_family; /* __SOCKADDR_COMMON(sin_) */
+         in_port_t sin_port; /* Port number. */
+         struct in_addr sin_addr; /* Internet address. */
+         /* Pad to size of `struct sockaddr'. */
+         unsigned char sin_zero[sizeof (struct sockaddr) - __SOCKADDR_COMMON_SIZE -
+         sizeof (in_port_t) - sizeof (struct in_addr)];
+      };
+     ```
    - 所有专用 socket 地址（以及 sockaddr_storage）类型的变量在实际使用时都需要转化为通用 socket 地址类型 sockaddr（强制转化即可），因为所有 socket 编程接口使用的地址参数类型都是 sockaddr。为的是向前兼容，传递地址。
-5.  IP地址转换函数（字符串ip-整数 ，主机、网络字节序的转换
+5.  IP地址转换函数（字符串ip-整数 ，主机、网络字节序的转换）
     - ```
       #include <arpa/inet.h>
       // p:点分十进制的IP字符串，n:表示network，网络字节序的整数
       int inet_pton(int af, const char *src, void *dst);
       af:地址族： AF_INET AF_INET6
-      src:需要转换的点分十进制的IP字符串
+      src:需要转换的点分十进制的IP字符串，带'.'，例:"192.168.1.1"
       dst:转换后的结果保存在这个里面
       // 将网络字节序的整数，转换成点分十进制的IP地址字符串
       const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
