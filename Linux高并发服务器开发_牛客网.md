@@ -1103,14 +1103,14 @@ void abort(void);
 4. alarm()
    unsigned int alarm(unsigned int seconds);
    - 功能：设置定时器（闹钟）。函数调用，开始倒计时，当倒计时为0的时候，
-                函数会给当前的进程发送一个信号：SIGALARM
+                函数会给当前的进程发送一个信号：SIGALRM
    - 参数：
       seconds: 倒计时的时长，单位：秒。如果参数为0，定时器无效（不进行倒计时，不发信号）。
                取消一个定时器，通过alarm(0)。
    - 返回值：
       - 之前没有定时器，返回0
       - 之前有定时器，返回之前的定时器剩余的时间
-   - SIGALARM ：默认终止当前的进程，每一个进程都有且只有唯一的一个定时器,会覆盖之前的定时器
+   - SIGALRM ：默认终止当前的进程，每一个进程都有且只有唯一的一个定时器,会覆盖之前的定时器
         alarm(10);  -> 返回0
         过了1秒
         alarm(5);   -> 返回9
@@ -1270,6 +1270,7 @@ struct sigaction {
    5. 返回用户模式从主控制流程中上次被中断的地方继续向下执行
 9. 一些注意事项
    - 尽量避免使用signal（不同的标准可能形式不一样），尽量使用sigaction
+   - 例：未决信号集SIGALRM为1，回调函数对应SIGALRM为1，则SIGALRM阻塞，回调函数处理完SIGALRM后未决信号集对应位置0
    - 如果信号处理函数正在处理第一个SIGALRM信号，然后又来了SIGALRM一个信号，后来的SIGALRM信号会默认被屏蔽，只有等前一个回调函数执行完，才会执行下一个回调函数
    - 执行信号捕捉函数时用的临时信号集，回调完后会切换到内核系统的阻塞信号集。也就说有两种对信号的处理方式，一种是sigprocmask处理的内核的阻塞信号集，还有一种是sigaction的临时信号集的处理。
    - 常规信号不支持排队，未决信号集只能标记一次的状态，即只能记录一个信号是否是未决，当其中某个信号被阻塞时，后面如果又来了相同的信号，它们都会被丢弃（其他序号32后面的支持排队）
@@ -1484,7 +1485,7 @@ struct sigaction {
    - 创建线程比创建进程通常要快 10 倍甚至更多。线程间是共享虚拟地址空间的，无需采用写时复制来复制内存，也无需复制页表。
 3. 线程和进程虚拟地址空间
    - 共享同一块虚拟地址空间：内核空间，共享库，堆空间，bss段，data段，text段，但是栈空间和text段不共享，分别为各自线程的特有的栈，text段
-   - bss段（存放程序中未初始化的全局变量），data段（存放程序中未初始化的全局变量），text段（存放程序执行代码）
+   - bss段（存放程序中未初始化的全局变量），data段（存放程序中初始化的全局变量），text段（存放程序执行代码）
 4. 线程之间共享和非共享资源
    - 共享资源
       - 进程 ID 和父进程 ID        
@@ -1960,4 +1961,105 @@ int pthread_cancel(pthread_t thread);
       ```
       unsigned char * p = (unsigned char *)&num;
       printf("%d %d %d %d\n", *p, *(p + 1), *(p + 2), *(p + 3));
+      
       ```
+
+#### 4.7 TCP通信流程
+1. TCP和UDP（传输层的协议）
+   - TCP:传输控制协议，面向连接的，可靠的，基于字节流，仅支持单播传输
+     - 字节流：建立连接
+     - 单播传输：只支持单点对单点的传输
+     - 可靠性：三次握手，四次挥手等等保值到达目的的时候不丢失，没到达可能会丢失
+     - 适用场景：可靠性高的应用（文件传输）
+     - 首部开销：最少20个字节
+   - UDP:用户数据报协议，面向无连接，可以单播，多播，广播， 面向数据报，不可靠
+     - 面向数据报：发送的为数据报包
+     - 不可靠：无连接的；发送方不会备份数据，发送方不关心是否到达；没有拥塞控制
+     - 适用场景：效率高，实时应用（qq聊天，视频会议，直播）
+     - 首部开销：8个字节
+2. TCP通信流程
+   - 服务器端
+     1. 创建一个用于监听的套接字
+        - 监听：监听有客户端的连接
+        - 套接字：这个套接字其实就是一个文件描述符
+     2. 将这个监听文件描述符和本地的IP和端口绑定（IP和端口就是服务器的地址信息）
+        - 客户端连接服务器的时候使用的就是这个IP和端口
+     3. 设置监听，监听的fd开始工作
+        - 监听监听的fd读缓冲区有没有数据
+        - 这个fd只用来监听，不用来和客户端通信，否则如果再来一个连接则都用这个fd会导致混乱
+        - 每个socket对应一个读写缓冲区
+     4. 阻塞等待，当有客户端发起连接，解除阻塞，接受客户端的连接，会得到一个和客户端通信的套接字（fd）
+     5. 通信
+        - 接收数据
+        - 发送数据
+     6. 通信结束，断开连接
+   - 客户端
+     1. 创建一个用于通信的套接字（fd）
+        - 不需要绑定自己的IP和端口，端口随机分配
+     3. 连接服务器，需要指定连接的服务器的 IP 和 端口
+     4. 连接成功了，客户端可以直接和服务器通信
+        - 接收数据
+        - 发送数据
+     5. 通信结束，断开连接
+
+#### 4.8 套接字函数
+1. 头文件
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h> // 包含了这个头文件，上面两个就可以省略
+2. int socket(int domain, int type, int protocol);
+   - 功能：创建一个套接字
+   - 参数：
+     - domain: 协议族
+       - AF_INET : ipv4
+       - AF_INET6 : ipv6
+       - AF_UNIX, AF_LOCAL : 本地套接字通信（进程间通信）
+     - type: 通信过程中使用的协议类型
+       - SOCK_STREAM : 流式协议
+       - SOCK_DGRAM : 报式协议
+     - protocol : 具体的一个协议。一般写0
+       - SOCK_STREAM : 流式协议默认使用 TCP
+       - SOCK_DGRAM :  报式协议默认使用 UDP
+   - 返回值：
+     - 成功：返回文件描述符，操作的就是内核缓冲区。
+     - 失败：-1
+3. int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen); // socket命名
+   - 功能：绑定，将fd 和本地的IP + 端口进行绑定
+   - 参数：
+     - sockfd : 通过socket函数得到的文件描述符
+     - addr : 需要绑定的socket地址，这个地址封装了ip和端口号的信息
+     - addrlen : 第二个参数结构体占的内存大小
+     - 传入IP和Port前先要用inet_pton和ntohs将其转换为网络字节序
+     - 由于一台计算机可能有多个网卡连接多个IP，saddr.sin_addr.s_addr = INADDR_ANY;意味着都可以使用这些IP来连接主机
+     ```
+      struct sockaddr_in saddr;
+      saddr.sin_family = AF_INET;
+      // inet_pton(AF_INET, "10.0.16.15", saddr.sin_addr.s_addr);
+      saddr.sin_addr.s_addr = INADDR_ANY;
+      saddr.sin_port = htons(9999);
+     ```
+4. int listen(int sockfd, int backlog); // /proc/sys/net/core/somaxconn
+   - 功能：监听这个socket上的连接
+   - 参数：
+     - sockfd : 通过socket()函数得到的文件描述符
+     - backlog : 未连接的和已经连接的和的最大值，5
+         底层为未连接队列，已连接队列，超过的会被丢失
+5. int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+   - 功能：接收客户端连接，默认是一个阻塞的函数，阻塞等待客户端连接
+   - 参数：
+     - sockfd : 用于监听的文件描述符
+     - addr : 传出参数，记录了连接成功后客户端的地址信息（ip，port）
+     - addrlen : 指定第二个参数的对应的内存大小，要在外面定义一个变量再传入其地址
+   - 返回值：
+     - 成功：用于通信的文件描述符，为了多客户端连接
+     - -1 ： 失败
+6. int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+   - 功能： 客户端连接服务器
+   - 参数：
+     - sockfd : 用于通信的文件描述符
+     - addr : 客户端要连接的服务器的地址信息
+     - addrlen : 第二个参数的内存大小
+   - 返回值：成功 0， 失败 -1
+7. ssize_t write(int fd, const void *buf, size_t count); // 写数据
+8. ssize_t read(int fd, void *buf, size_t count); // 读数据
+9. 有特有的发送接受数据的函数，以后会介绍
