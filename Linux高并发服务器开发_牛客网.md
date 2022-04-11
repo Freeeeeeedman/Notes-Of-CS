@@ -2132,9 +2132,8 @@ int pthread_cancel(pthread_t thread);
    - 因为在TCP连接的时候，采用三次握手建立的的连接是双向的，在断开的时候需要双向断开。
 2. 为什么要断开连接
    回收资源，销毁比如对面的IP和端口等信息
-3. 为什么是四次挥手而不是三次挥手？
-4. 第一次挥手可以携带数据
-5. 发起断开连接放再发送FIN后就不能发送数据了，但可以接受数据（这里数据不是指报文数据而是指要传输的数据）
+3. 第一次挥手可以携带数据
+4. 发起断开连接放再发送FIN后就不能发送数据了，但可以接受数据（这里数据不是指报文数据而是指要传输的数据）
 
 #### 4.12 TCP通信并发
 1. 要实现TCP通信服务器处理并发的任务，使用多线程或者多进程来解决。
@@ -2143,7 +2142,7 @@ int pthread_cancel(pthread_t thread);
    2. 父进程负责等待并接受客户端的连接
    3. 子进程：完成通信，接受一个客户端连接，就创建一个子进程用于通信
 3. 多进程实现
-   - 主进程bind,listen,accept，close(lfd)
+   - 主进程bind,listen,accept(循环内)，close(lfd)
    - 子进程：read,write,close(cfd),exit(0)
    - 注意：
       ```
@@ -2161,3 +2160,73 @@ int pthread_cancel(pthread_t thread);
             exit(-1);
         }
       ```
+4. 多线程实现
+   - 与多进程实现的区别
+     - 不需要wait和sigaction，使用detach设置分离，自动回收线程
+     - 没有写时拷贝功能，共享数据，while(1)循环内定义的变量为临时变量，当本次循环结束即释放，所以需要通过全局定义struct sockInfo sockinfos[128];再在循环内定义struct sockInfo * pinfo;指针获取数据，再通过pthread_create(&pinfo->tid, NULL, working, pinfo);传递封装后的参数
+   - 具体实现
+      ```
+      \\定义全局结构体
+      struct sockInfo {
+         int fd;
+         pthread_t tid;
+         struct sockaddr_in addr;
+      };
+      struct sockInfo sockinfos[128];     
+
+      \\初始化全局结构体
+      int max = sizeof(sockinfos) / sizeof(sockinfos[0]);
+      for(int i = 0; i < max; i++) {
+         bzero(&sockinfos[i], sizeof(sockinfos[i]));
+         sockinfos[i].fd = -1;
+         sockinfos[i].tid = -1;
+      }
+
+      \\结构体赋值，传递参数
+        struct sockInfo * pinfo;
+        for(int i = 0; i < max; i++) {
+            if(sockinfos[i].fd == -1) {
+                pinfo = &sockinfos[i];
+                break;
+            }
+            if(i == max - 1) {
+                sleep(1);
+                i--;
+            }
+        }
+        pinfo->fd = cfd;
+        memcpy(&pinfo->addr, &cliaddr, len);
+        pthread_create(&pinfo->tid, NULL, working, pinfo);
+        pthread_detach(pinfo->tid); 
+    ```      
+
+#### 4.13 TCP 状态转换
+1. 三次握手和四次挥手的状态转换
+2. 通信过程中状态不发生改变
+3. 连接时发生异常的时的状态转换
+4. 为什么是四次挥手而不是三次挥手？
+   - 第三次挥手和第二次挥手之间可能还要一段时间
+   - 比如客户端要和服务器断开连接，但服务器不想和客户端断开连接，还要发送数据给客户端
+5. 为什么TIME_WAIT要等待2MSL
+   确保TCP的安全性，确保通信的另外一方能接收到第四次挥手的ACK,这样就能够让 TCP 连接的主动关闭方在它发送的 ACK 丢失的情况下重新发送最终的 ACK。
+
+#### 4.14 半关闭和端口复用
+1. 半关闭
+   - 当 TCP 链接中 A 向 B 发送 FIN 请求关闭，另一端 B 回应 ACK 之后（A 端进入 FIN_WAIT_2状态），并没有立即发送 FIN 给 A，A 方处于半连接状态（半开关），此时 A 可以接收 B 发送的数据，但是 A 已经不能再向 B 发送数据
+   - 作用：单向通信
+   - API实现
+      ```
+      #include <sys/socket.h>
+      int shutdown(int sockfd, int how);
+      sockfd: 需要关闭的socket的描述符
+      how: 允许为shutdown操作选择以下几种方式:
+      SHUT_RD(0)： 关闭sockfd上的读功能，此选项将不允许sockfd进行读操作。
+      该套接字不再接收数据，任何当前在套接字接受缓冲区的数据将被无声的丢弃掉。
+      SHUT_WR(1): 关闭sockfd的写功能，此选项将不允许sockfd进行写操作。进程不能在对此套接字发出写操作。
+      SHUT_RDWR(2):关闭sockfd的读写功能。相当于调用shutdown两次：首先是以SHUT_RD,然后以
+      SHUT_WR。
+      ```
+   - 与close的区别
+      - 使用 close 中止一个连接，但它只是减少描述符的引用计数，并不直接关闭连接，只有当描述符的引用计数为 0 时才关闭连接。shutdown 不考虑描述符的引用计数，直接关闭描述符。也可选择中止一个方向的连接，只中止读或只中止写。
+      - 如果有多个进程共享一个套接字，close 每被调用一次，计数减 1 ，直到计数为 0 时，也就是所用进程都调用了 close，套接字将被释放。
+      - 在多进程中如果一个进程调用了 shutdown(sfd, SHUT_RDWR) 后，其它的进程将无法进行通信。但如果一个进程 close(sfd) 将不会影响到其它进程
