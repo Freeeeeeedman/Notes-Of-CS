@@ -2231,3 +2231,100 @@ int pthread_cancel(pthread_t thread);
       - 如果有多个进程共享一个套接字，close 每被调用一次，计数减 1 ，直到计数为 0 时，也就是所用进程都调用了 close，套接字将被释放。
       - 在多进程中如果一个进程调用了 shutdown(sfd, SHUT_RDWR) 后，其它的进程将无法进行通信。但如果一个进程 close(sfd) 将不会影响到其它进程
       - **这个close是监听的close还是accept返回的close？注意客户端没有用于监听的fd**
+2. 端口复用
+   - 用途
+     - 防止服务器重启时之前绑定的端口还未释放(2MSL)
+     - 程序突然退出而系统没有释放端口
+   - 设置套接字的属性（不仅仅能设置端口复用）
+      int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
+      - 参数：
+      - sockfd : 要操作的文件描述符
+      - level : 级别 - SOL_SOCKET (端口复用的级别)
+      - optname : 选项的名称
+        - SO_REUSEADDR
+        - SO_REUSEPORT
+      - optval : 端口复用的值（整形）
+        - 1 : 可以复用
+        - 0 : 不可以复用
+      - optlen : optval参数的大小,optval既可以是整形也可以是结构体，所以要指定长度
+   - 端口复用，设置的时机是在服务器绑定端口之前。
+      ```
+      int optval = 1;
+      setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+      ```
+      setsockopt();
+      bind();
+
+#### 4.16 I/O多路复用（I/O多路转接）
+1. 输入与输出
+   - 输入：文件数据输入到内存中
+   - 输出：内存数据输出到文件中
+   - 这里的I/O是指对读、写缓冲区的操作
+2. I/O多路复用的作用
+   - I/O 多路复用使得程序能同时监听多个文件描述符，能够提高程序的性能，Linux 下实现 I/O 多路复用的系统调用
+   - 主要有 select、poll 和 epoll
+3. 几种I/O模型
+   - 阻塞等待（BIO模型）
+     - 每个线程/进程对应一个Client
+     - 根本原因：accept，recv，read都是阻塞的
+     - 好处：不占用CPU的时间片
+     - 缺点：同一时刻只能处理一个操作，效率低
+     - 解决方案
+       - 通过多线程或多进程解决，并发执行
+       - 缺点
+         - 线程或者进程会消耗资源
+         - 线程或者进程调度会消耗CPU资源
+   - 非阻塞，忙轮询（NIO模型）
+     - 根本原因：accept，recv，read都是非阻塞的
+     - 优点：提高了程序的执行效率
+     - 缺点：需要占用更多的CPU和系统资源（因为需要一直循环问询）
+     - 解决方案
+       - 使用IO多路复用技术select/poll/epoll
+       - 把socketfd都传给内核，让内核来检测是否有新的数据，这样只调用一次系统调用，而不是调用多次read/recv
+       - 缺点：每循环内O(n)系统调用，需要调用n次read/recv去遍历读缓冲区是否有新的数据，非常浪费系统资源
+4. select
+   - 主旨思想
+       1. 首先要构造一个关于文件描述符的列表，将要监听的文件描述符添加到该列表中。
+       2. 调用一个系统函数，监听该列表中的文件描述符，直到这些描述符中的一个或者多个进行I/O操作时，该函数才返回。
+         a.这个函数是阻塞
+         b.函数对文件描述符的检测的操作是由内核完成的
+       3. 在返回时，它会告诉进程有多少（哪些）描述符要进行I/O操作。
+   - int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+     - 参数：
+       - nfds : 委托内核检测的最大文件描述符的值 + 1
+       - readfds : 要检测的文件描述符的读的集合，委托内核检测哪些文件描述符的读的属性
+         - sizeof(fd_set) = 128 1024
+         - 一般检测读操作
+         - 对应的是对方发送过来的数据，因为读是被动的接收数据，检测的就是读缓冲
+         区
+         - 是一个传入传出参数,通过这个判断哪些缓冲区发生了变化
+       - writefds : 要检测的文件描述符的写的集合，委托内核检测哪些文件描述符的写的属性
+         - 委托内核检测写缓冲区是不是还可以写数据（不满的就可以写）
+       - exceptfds : 检测发生异常的文件描述符的集合
+       - timeout : 设置的超时时间
+           ```
+           struct timeval {
+              long tv_sec; /* seconds */
+              long tv_usec; /* microseconds */
+           };
+           ```
+         - NULL : 永久阻塞，直到检测到了文件描述符有变化
+         - tv_sec = 0 tv_usec = 0， 不阻塞
+         - tv_sec > 0 tv_usec > 0， 阻塞对应的时间
+     - 返回值 :
+       - -1 : 失败
+       - \>0(n) : 检测的集合中有n个文件描述符发生了变化
+   - void FD_CLR(int fd, fd_set *set);
+      将参数文件描述符fd对应的标志位设置为0
+   - int FD_ISSET(int fd, fd_set *set);
+      判断fd对应的标志位是0还是1
+      返回值：fd对应的标志位的值，0，返回0， 1，返回1
+   - void FD_SET(int fd, fd_set *set);
+      将参数文件描述符fd 对应的标志位，设置为1
+   - void FD_ZERO(fd_set *set);
+      fd_set一共有1024 bit, 全部初始化为0，前三个被占用
+   - 工作流程
+      用户态拷贝表到内核态，内核遍历表，对应缓冲区有变化的置为1。再拷贝到用户态。用户态再遍历表，读取数据
+   - 问题
+      都是要遍历的，为什么还要设置FD_SET？
+       如果没有数据，会置为0，下次就不检测它了
