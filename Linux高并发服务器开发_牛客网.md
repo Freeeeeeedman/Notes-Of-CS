@@ -2371,4 +2371,64 @@ int pthread_cancel(pthread_t thread);
    - poll:遍历i：结构体数组下标
 5. 实现流程
    创建，绑定，监听，初始化文件描述符数组，select/poll，先判断监听lfd是否有变化，有变化则accept，再循环判断cfd是否有变化，有变化则通信
-   
+
+#### 4.19 epoll
+1. poll缺点
+   - 调用poll把需要检测的文件描述符的集合从用户态拷贝到内核态，开销大
+   - 每次调用poll都需要在内核遍历传递进来的所有文件描述符，开销大
+2. epoll优点
+   - 不需要从用户态拷贝数据到内核态
+   - 遍历结构为红黑树。效率高
+   - 直接返回已经发生改变的文件描述符，不需要再次遍历
+3. epoll_create
+   - 创建一个新的epoll实例。在内核中创建了一个数据，这个数据中有两个比较重要的数据，一个是需要检测的文件描述符的信息（红黑树），还有一个是就绪列表，存放检测到数据发送改变的文件描述符信息（双向链表）
+   - int epoll_create(int size);
+     - 参数：
+         - size : 目前没有意义了。随便写一个数，必须大于0
+     - 返回值：
+         -1 : 失败
+         \> 0 : 文件描述符，操作epoll实例的
+      ```
+         typedef union epoll_data {
+            void *ptr;
+            int fd;
+            uint32_t u32;
+            uint64_t u64;
+         } epoll_data_t;
+         struct epoll_event {
+            uint32_t events; /* Epoll events */
+            epoll_data_t data; /* User data variable */
+         };
+      ```
+   - 常见的Epoll检测事件：
+     - EPOLLIN
+     - EPOLLOUT
+     - EPOLLERR
+4. epoll_ctl
+   - 对epoll实例进行管理：添加文件描述符信息，删除信息，修改信息
+   - int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+     - 参数：
+       - epfd : epoll实例对应的文件描述符
+       - op : 要进行什么操作
+               EPOLL_CTL_ADD: 添加
+               EPOLL_CTL_MOD: 修改
+               EPOLL_CTL_DEL: 删除
+       - fd : 要检测的文件描述符
+       - event : 检测文件描述符什么事情
+5. epoll_wait
+   - 检测函数
+   - 参数：
+     - epfd : epoll实例对应的文件描述符
+     - events : 传出参数，保存了发送了变化的文件描述符的信息
+     - maxevents : 第二个参数结构体数组的大小
+     - timeout : 阻塞时间
+       - 0 : 不阻塞
+       - -1 : 阻塞，直到检测到fd数据发生变化，解除阻塞
+       - \> 0 : 阻塞的时长（毫秒）
+   - 返回值：
+       - 成功，返回发送变化的文件描述符的个数 > 0
+       - 失败 -1
+6. 流程
+   创建socket，绑定，监听，创建epoll实例并向其中添加lfd，循环内检测epoll实例，如果lfd发生改变则accept并向epoll实例添加cfd，如果cfd发生改变则进行通信
+7. 注意
+   如果监听了很多的事件，就要对每个事件做判断，进行不同的处理
