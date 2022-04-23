@@ -2209,7 +2209,7 @@ int pthread_cancel(pthread_t thread);
    - 比如客户端要和服务器断开连接，但服务器不想和客户端断开连接，还要发送数据给客户端
 5. 为什么TIME_WAIT要等待2MSL
    确保TCP的安全性，确保接收方能接收到主动关闭方第四次挥手的ACK,这样就能够让 TCP 连接的主动关闭方在它发送的 ACK 丢失的情况下重新发送最终的 ACK。
-
+6. 查看TCP连接信息：netstat -anp 
 #### 4.14 半关闭和端口复用
 1. 半关闭
    - 当 TCP 链接中 A 向 B 发送 FIN 请求关闭，另一端 B 回应 ACK 之后（A 端进入 FIN_WAIT_2状态），并没有立即发送 FIN 给 A，A 方处于半连接状态（半开关），此时 A 可以接收 B 发送的数据，但是 A 已经不能再向 B 发送数据
@@ -2275,7 +2275,6 @@ int pthread_cancel(pthread_t thread);
          - 线程或者进程会消耗资源
          - 线程或者进程调度会消耗CPU资源
    - 非阻塞，忙轮询（NIO模型）
-     - 根本原因：accept，recv，read都是非阻塞的
      - 优点：提高了程序的执行效率
      - 缺点：需要占用更多的CPU和系统资源（因为需要一直循环问询）
      - 解决方案
@@ -2285,11 +2284,11 @@ int pthread_cancel(pthread_t thread);
 #### 4.17 select
 1. 使用select完成多客户端多服务端的连接
 2. 主旨思想
-  1. 首先要构造一个关于文件描述符的列表，将要监听的文件描述符添加到该列表中。
-  2. 调用一个系统函数，监听该列表中的文件描述符，直到这些描述符中的一个或者多个进行I/O操作时，该函数才返回。
-      a.这个函数是阻塞
-      b.函数对文件描述符的检测的操作是由内核完成的
-  3. 在返回时，它会告诉进程有多少（哪些）描述符要进行I/O操作。
+     1. 首先要构造一个关于文件描述符的列表，将要监听的文件描述符添加到该列表中。
+     2. 调用一个系统函数，监听该列表中的文件描述符，直到这些描述符中的一个或者多个进行I/O操作时，该函数才返回。
+         a.这个函数是阻塞
+         b.函数对文件描述符的检测的操作是由内核完成的
+     3. 在返回时，它会告诉进程有多少（哪些）描述符要进行I/O操作。
 3. int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
    - 参数：
      - nfds : 委托内核检测的最大文件描述符的值 + 1
@@ -2404,6 +2403,7 @@ int pthread_cancel(pthread_t thread);
      - EPOLLIN
      - EPOLLOUT
      - EPOLLERR
+     - EPOLLET 边沿触发
 4. epoll_ctl
    - 对epoll实例进行管理：添加文件描述符信息，删除信息，修改信息
    - int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
@@ -2432,3 +2432,61 @@ int pthread_cancel(pthread_t thread);
    创建socket，绑定，监听，创建epoll实例并向其中添加lfd，循环内检测epoll实例，如果lfd发生改变则accept并向epoll实例添加cfd，如果cfd发生改变则进行通信
 7. 注意
    如果监听了很多的事件，就要对每个事件做判断，进行不同的处理
+
+#### 4.20 epoll的两种工作模式
+1. LT 模式 （水平触发）
+   - LT（level - triggered）是缺省的工作方式，并且同时支持 block 和 no-block socket。在这种做法中，内核告诉你一个文件描述符是否就绪了，然后你可以对这个就绪的 fd 进行 IO 操作。如果你不作任何操作，内核还是会继续通知你的。
+   - 假设委托内核检测读事件 -> 检测fd的读缓冲区
+      读缓冲区有数据 - > epoll检测到了会给用户通知
+      a.用户不读数据，数据一直在缓冲区，epoll 会一直通知
+      b.用户只读了一部分数据，epoll会通知
+      c.缓冲区的数据读完了，不通知
+2. ET 模式（边沿触发）
+   - ET（edge - triggered）是高速工作方式，只支持 no-block socket。在这种模式下，当描述符从未就绪变为就绪时，内核通过epoll告诉你。然后它会假设你知道文件描述符已经就绪，并且不会再为那个文件描述符发送更多的就绪通知，直到你做了某些操作导致那个文件描述符不再为就绪状态了。但是请注意，如果一直不对这个 fd 作 IO 操作（从而导致它再次变成未就绪），内核不会发送更多的通知（only once）。
+   - ET 模式在很大程度上减少了 epoll 事件被重复触发的次数，因此效率要比 LT 模式高。epoll工作在 ET 模式的时候，必须使用非阻塞套接口，以避免由于一个文件描述符的阻塞读/阻塞写操作把处理多个文件描述符的任务饿死。
+   - 假设委托内核检测读事件 -> 检测fd的读缓冲区
+      读缓冲区有数据 - > epoll检测到了会给用户通知
+      a.用户不读数据，数据一致在缓冲区中，epoll下次检测的时候就不通知了
+      b.用户只读了一部分数据，epoll不通知
+      c.缓冲区的数据读完了，不通知
+   - EPOLL EVENTS添加事件：EPOLLET 
+   - read函数的非阻塞由其读取的文件描述符控制;数据读完了再用非阻塞read会产生EAGAIN的错误，要忽略
+      ```
+         int flag = fcntl(cfd, F_GETFL);
+         flag |= O_NONBLOCK;
+         fcntl(cfd, F_SETFL, flag);
+      -------------------------------------
+         else if(len == -1) {
+            if(errno == EAGAIN) {
+               printf("data over.....")
+            }else {
+               perror("read");
+               exit(-1);
+            }
+
+      ```
+   
+#### 4.21 UDP通信
+1. UDP通信流程
+   - 客户端
+      socket(), sendto(), recefrom(), close()
+   - 服务端
+      socket(), bind(), recvfrom(), sendto(), close()
+
+2. ssize_t sendto(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen);
+   - 参数：
+     - sockfd : 通信的fd
+     - buf : 要发送的数据
+     - len : 发送数据的长度
+     - flags : 0
+     - dest_addr : 通信的另外一端的地址信息
+     - addrlen : 地址的内存大小
+3. ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags, struct sockaddr *src_addr, socklen_t *addrlen);
+   - 参数：
+     - sockfd : 通信的fd
+     - buf : 接收数据的数组
+     - len : 数组的大小
+     - flags : 0
+     - src_addr : 用来保存另外一端的地址信息，不需要可以指定为NULL
+     - addrlen : 地址的内存大小
+4. UDO不需要多线程或多进程也可以和多客户端通信
