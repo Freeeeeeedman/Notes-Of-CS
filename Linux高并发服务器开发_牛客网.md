@@ -2490,3 +2490,116 @@ int pthread_cancel(pthread_t thread);
      - src_addr : 用来保存另外一端的地址信息，不需要可以指定为NULL
      - addrlen : 地址的内存大小
 4. UDO不需要多线程或多进程也可以和多客户端通信
+
+
+#### 4.22 UDP广播
+1. 概念
+   向子网中多台计算机发送消息，并且子网中所有的计算机都可以接收到发送方发送的消息，每个广播消息都包含一个特殊的IP地址，这个IP中子网内主机标志部分的二进制全部为1
+2. 注意
+   - 只能在局域网中使用。
+   - 客户端需要绑定服务器广播使用的端口，才可以接收到广播消息。
+3. 需要改变的地方
+   - 发送方
+     - 设置sockfd广播属性
+     - 仅发送，不需要bind
+   - 接受方
+     - bind本地的IP和端口
+4. 设置广播属性的函数
+   int setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t
+optlen);
+   - sockfd : 文件描述符
+   - level : SOL_SOCKET
+   - optname : SO_BROADCAST 指定广播
+   - optval : int类型的值，为1表示允许广播
+   - optlen : optval的大小
+5. 流程
+   - 服务器端：创建socket， 设置广播属性setsockopt，创建广播的客户端地址， 发送数据
+   - 客户端： 创建socket， 客户端绑定的IP和端口， 接受数据
+6. 有关bind
+   - 为什么一般通信是服务器端绑定端口
+      这里是客户端先连接服务器端。所有客户端需要连接同一个指定的主机的端口，这个信息需要事先知道才能够连接。而客户端随机分配端口，这个端口信息会在通信时发送给服务器端。
+   - 为什么广播是客户端绑定端口
+      这里是服务器端先向客户端发送数据。因为这里是服务器端主动给局域网内所有的主机发送数据。服务器端需要先知道指发送的广播IP和端口。为了接受到广播数据，局域网内客户端必须绑定同一端口。如果不采用这样的方式会很麻烦，相当于对每个不同主机IP都要通信。同时这里的服务器端端口随机分配。
+#### 4.23 UDP组播（多播）
+1. 概念
+   单播地址标识单个 IP 接口，广播地址标识某个子网的所有 IP 接口，多播地址标识一组 IP 接口。单播和广播是寻址方案的两个极端（要么单个要么全部），多播则意在两者之间提供一种折中方案。多播数据报只应该由对它感兴趣的接口接收，也就是说由运行相应多播会话应用系统的主机上的接口接收。另外，广播一般局限于局域网内使用，而多播则既可以用于局域网，也可以跨广域网使用。
+2. 注意
+   - 组播既可以用于局域网，也可以用于广域网
+   - 客户端需要加入多播组，才能接收到多播的数据
+3. 组播地址
+   IP 多播通信必须依赖于 IP 多播地址，在 IPv4 中它的范围从 224.0.0.0 到 239.255.255.255 ，并被划分为局部链接多播地址、预留多播地址和管理权限多播地址三类。 
+4. 设置组播
+int setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t optlen);
+   - 服务器设置多播的信息，外出接口
+     - level : IPPROTO_IP
+     - optname : IP_MULTICAST_IF
+     - optval : struct in_addr
+   - 客户端加入到多播组：
+     - level : IPPROTO_IP
+     - optname : IP_ADD_MEMBERSHIP
+     - optval : struct ip_mreq
+   ```
+   struct ip_mreq
+   {
+      /* IP multicast address of group. */
+      struct in_addr imr_multiaddr; // 组播的IP地址
+      /* Local IP address of interface. */
+      struct in_addr imr_interface; // 本地的IP地址
+   };
+   typedef uint32_t in_addr_t;
+   struct in_addr
+   {
+      in_addr_t s_addr;
+   };
+   ```
+5. 流程
+   - 服务器端：创建socket，设置多播属性setsockopt，初始化客户端的地址信息，发送数据
+   - 客户端：创建socket，绑定IP和端口， 加入到多播组setsockopt， 接受数据
+
+#### 4.24 本地套接字
+1. 用途
+   - 本地套接字的作用：本地的进程间通信
+      有关系的进程间的通信
+      没有关系的进程间的通信
+2. 本地套接字通信的流程TCP
+   - 本地套接字实现流程和网络套接字类似，一般采用TCP的通信流程
+   - 服务器端
+       1. 创建监听的套接字
+           int lfd = socket(AF_UNIX/AF_LOCAL, SOCK_STREAM, 0);
+       2. 监听的套接字绑定本地的套接字文件 -> server端
+           struct sockaddr_un addr;
+           // 绑定成功之后，指定的sun_path中的套接字文件会自动生成。
+           bind(lfd, addr, len);
+       3. 监听
+           listen(lfd, 100);
+       4. 等待并接受连接请求
+           struct sockaddr_un cliaddr;
+           int cfd = accept(lfd, &cliaddr, len);
+       5. 通信
+           接收数据：read/recv
+           发送数据：write/send
+       6. 关闭连接
+           close()
+   - 客户端
+       1. 创建通信的套接字
+         int fd = socket(AF_UNIX/AF_LOCAL, SOCK_STREAM, 0);
+       2. 监听的套接字绑定本地的IP端口
+         struct sockaddr_un addr;
+         // 绑定成功之后，指定的sun_path中的套接字文件会自动生成。
+         bind(lfd, addr, len);
+       3. 连接服务器
+         struct sockaddr_un serveraddr;
+         connect(fd, &serveraddr, sizeof(serveraddr));
+       4. 通信
+         接收数据：read/recv
+         发送数据：write/send
+       5. 关闭连接
+         close();
+   ```
+   #define UNIX_PATH_MAX 108
+   struct sockaddr_un {
+      sa_family_t sun_family; // 地址族协议 af_local
+      char sun_path[UNIX_PATH_MAX]; // 套接字文件的路径, 这是一个伪文件, 大小永远=0
+   };
+   ```
+3. 服务端和客户端都是伪文件，实质是内核缓冲区。两者都有读写缓冲区。服务器端写入客户端读缓冲区，客户端写入服务器端写缓冲区。
