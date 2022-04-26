@@ -2667,3 +2667,5 @@ int setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t 
 1. 什么现在大多数框架都使用reactor模型？
    -  在 Linux 下的异步 I/O 是不完善的，aio 系列函数是由 POSIX 定义的异步操作接口，不是真正的操作系统级别支持的，而是在用户空间模拟出来的异步，并且仅仅支持基于本地文件的 aio 异步操作，网络编程中的 socket 是不支持的，这也使得基于 Linux 的高性能网络程序都是使用 Reactor 方案。
    - 而 Windows 里实现了一套完整的支持 socket 的异步编程接口，这套接口就是 IOCP，是由操作系统级别实现的异步 I/O，真正意义上异步 I/O，因此在 Windows 里实现高性能网络程序可以使用效率更高的 Proactor 方案。
+
+#### 5.5 线程同步机制及线程池
