@@ -33,18 +33,7 @@ void bag01_1d() {
     cout << dp[bagweight] << endl;
 }
 
-void bag01_1d_() {
-    vector<int> weight = {1, 3, 4};
-    vector<int> value = {15, 20 ,30};
-    int bagweight = 4;
-    vector<int> dp(bagweight + 1, 0);
-    for(int i = 0; i < weight.size(); i++) {
-        for(int j = bagweight; j >= weight[i]; j--) {
-            dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
-        }
-    }
-    cout << dp[bagweight] <<endl;
-}
+
 
 void bagmuti_01() {
     vector<int> weight = {1, 3, 4};
