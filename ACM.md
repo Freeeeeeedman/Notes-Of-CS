@@ -3,6 +3,7 @@
    - 以空格、tab或换行（回车也是换行）作为分隔符
         cin>>a>>b>>c;
    - 也可以接受一个字符串，遇 tab/space/enter 结束
+   - int a; cin >> a; 输入字符'1'，a结果也为int类型1
 2. cin.get()
    - 读取一个字符，返回值是int类型，是输入的字符的ASCII码值
    - **不会忽略分隔符**，若用的回车当分隔符，则会在输出的时候把回车也打印出来，造成了不用endl也换行的情况；
@@ -32,3 +33,69 @@
 3. 代码里面循环处理了即使是单组测试也会完全没问题，所以为了偷懒，可以全写成循环处理。
 
 4. 还有一个坑：如果测试数据是多组的，但是恰巧你代码里面需要些标记数组，map，set等，在循环内一定记得清空，不然可能会产生前面的测试样例影响了后续数据的答案。
+
+#### 做题时要点总结
+1. ACM模式中对应各类格式的输入数据的处理要熟稔
+   https://ac.nowcoder.com/acm/contest/5657/G
+2. 定义输入变量时一定要先初始化，否则会有随机值
+3. 对于一些单次输入，要求输出的结果应该在while()循环内定义，这样就不用重新初始化了。
+4. 每次循环内要清空数组，map，set， vector， string，cin，stringstream
+      - cin.sync();
+      - str.clear();
+      - ss.clear();
+5. 一些头文件
+   - #include<bits/stdc++.h>：所有c++标准库的头文件
+   - #include <iostream>：cin，cout
+   - #include <sstream>：stringstream输入输出流
+   - #include <algorithm>：一些算法，如sort()
+   - #include <string>:字符串string
+6. cin()
+   cin >> 以空格，换行，tab为结束符。但是会保留最后一个换行在缓冲区中。同时也不会读取最后一个空格。
+7. getline()
+   - 用来处理字符串的，输入的必须是字符串
+   - 注意getline()默认在处理单行数据时是不以空格为分割的，会全部输入！
+   - 在标准输入中连续使用cin>>, getline()时要用getchar()清除前一个cin>>留下的换行。注意如果缓冲区中还要空格也会被读取出来(但是如果用了stringstream流就不需要写getchar())
+   - getline使用cin流，以'#'分割，但只会输出#前的字符
+   - getline使用stringstream流，就可以正常输出所有以#分割的字符，包括最后一段
+8. cin.get()
+   - 用来读取换行符
+
+#### 针对特定输入数据的处理模板
+1. 输入数据有多组, 每行表示一组输入数据，没有指明每行有几个数据
+   ```
+   #include <iostream>
+   using namespace std;
+
+   int main() {
+      int ele = 0;
+      while(cin >> ele) {
+         cin.sync();
+         int sum = ele;
+         while(getchar() != '\n') {
+               cin >> ele;
+               sum += ele;
+         }
+         cout << sum << endl;
+      }
+   }
+   ```
+2. 输入数据有多组，第一行表述数据组数，接下来每行第一个整数表示数据数目，其余表示数据
+   ```
+   #include <iostream>
+   using namespace std;
+
+   int main() {
+      int t = 0;
+      cin >> t;
+      int n = 0;
+      while(cin >> n) {
+         cin.sync();
+         int sum = 0, tmp = 0;
+         for(int i = 0; i < n; i++) {
+               cin >> tmp;
+               sum += tmp;
+         }
+         cout << sum << endl;
+      }
+   }
+   ```
