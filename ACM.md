@@ -38,26 +38,39 @@
 1. ACM模式中对应各类格式的输入数据的处理要熟稔
    https://ac.nowcoder.com/acm/contest/5657/G
 2. 定义输入变量时一定要先初始化，否则会有随机值
-3. 对于一些单次输入，要求输出的结果应该在while()循环内定义，这样就不用重新初始化了。
+3. 对于一些单次输入，要求输出的结果在循环外初始化，但必须要记得在循环内每次都要清空。
 4. 每次循环内要清空数组，map，set， vector， string，cin，stringstream
       - cin.sync();
       - str.clear();
       - ss.clear();
-5. 一些头文件
+5. 看清楚结果的输出格式，例如循环输出了cout << str << ' ';，但要记得最后还要补加一个cout << endl;来区分不同的结果
+6. 在处理单组多个字符串时，如果是以空格为分割，用cin结合getchar()就可以了，但如果以其他符号分割，就必须用getline()结合stringstream
+7. 审题时一定要注意数据范围，否则结果溢出即使思路对答案也是错误的！
+      int                        [-2^31,2^31-1] ~ 2 * 10 ^ 9
+      unsigned                   [0,2^32-1]
+      long long                  [-2^63,2^63-1]
+      unsigned long long         [0,2^64-1]
+      char                       [-128,127]
+
+      double        [-2^1024,2^1023] 即 [-1.7E+308,1.7E+308] 精度为16位左右
+      long double   [-1.2e4932,1.2e4932] 精度不低于 double
+
+
+8. 一些头文件
    - #include<bits/stdc++.h>：所有c++标准库的头文件
    - #include <iostream>：cin，cout
    - #include <sstream>：stringstream输入输出流
    - #include <algorithm>：一些算法，如sort()
    - #include <string>:字符串string
-6. cin()
+9.  cin()
    cin >> 以空格，换行，tab为结束符。但是会保留最后一个换行在缓冲区中。同时也不会读取最后一个空格。
-7. getline()
+11. getline()
    - 用来处理字符串的，输入的必须是字符串
    - 注意getline()默认在处理单行数据时是不以空格为分割的，会全部输入！
    - 在标准输入中连续使用cin>>, getline()时要用getchar()清除前一个cin>>留下的换行。注意如果缓冲区中还要空格也会被读取出来(但是如果用了stringstream流就不需要写getchar())
    - getline使用cin流，以'#'分割，但只会输出#前的字符
    - getline使用stringstream流，就可以正常输出所有以#分割的字符，包括最后一段
-8. cin.get()
+11. getchar()
    - 用来读取换行符
 
 #### 针对特定输入数据的处理模板
@@ -96,6 +109,74 @@
                sum += tmp;
          }
          cout << sum << endl;
+      }
+   }
+   ```
+
+3. 输入数据有多组， 输入的为字符串，以空格为分隔，每行为一组数据
+   ```
+   #include <iostream>
+   #include <algorithm>
+   #include <vector>
+   #include <string>
+   using namespace std;
+
+   int main() {
+      vector<string> strs;
+      string str;
+      while(cin >> str) {
+         cin.sync();
+         strs.clear();
+         strs.push_back(str);
+         while(getchar() != '\n') {
+               cin >> str;
+               strs.push_back(str);
+         }
+         sort(strs.begin(), strs.end());
+         for(auto& str : strs) {
+               cout << str << ' ';
+         }
+         cout << endl;
+      }
+   }
+   ```
+
+4. 输入数据有多组， 输入的为字符串，以','为分隔，每行为一组数据
+   ```
+   #include <iostream>
+   #include <sstream>
+   #include <algorithm>
+   #include <vector>
+   #include <string>
+   using namespace std;
+
+   int main() {
+      vector<string> strs;
+      string str;
+      while(getline(cin, str)) {
+         strs.clear();
+         stringstream ss(str);
+         while(getline(ss, str, ',')) {
+               strs.push_back(str);
+         }
+         sort(strs.begin(), strs.end());
+         for(int i = 0; i < strs.size() - 1; i++) {
+               cout << strs[i] << ',';
+         }
+         cout << strs[strs.size() - 1] << endl;
+      }
+      
+   }
+   ```
+   5. 数据范围： 0 < a,b < 2 x 10 ^ 10
+   ```
+   #include <iostream>
+   using namespace std;
+
+   int main() {
+      long long a = 0, b = 0;
+      while(cin >> a >> b) {
+         cout << a + b << endl;
       }
    }
    ```
