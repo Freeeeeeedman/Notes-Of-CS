@@ -84,3 +84,10 @@
    - kill
    - pstree
      - -p， -u 
+11. linux一些常用的网络相关的命令
+    netstate
+    ss
+    route
+    ping
+    traceroute
+    等等...
