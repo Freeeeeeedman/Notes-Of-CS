@@ -97,13 +97,14 @@
 
 #### 2. linux面试问题
 1. 说一说常用的命令
-    一般命令：ls，pwd，cd,ln
-    文件命令：touch,cp,mv,rm,tar,find
-    权限命令：su,chmod
-    磁盘命令：df，du
-    进程命令：ps，top，kill
-    网络命令：ping, ifconfig(网卡),netstat（TCP/IP网络监控），ss（同netstat）
-    文本命令：cat，vim，grep,awk(用于正则匹配来筛选数据，用过一点，后来不用了，用python来做数据处理更方便)
+
+    一般命令：ls，pwd，cd,ln， touch,cp,mv,rm,tar,find， su,chmod，ldd
+    数据处理命令：cat，vim，grep,awk(用于正则匹配来筛选数据，用过一点，后来不用了，用python来做数据处理更方便)
+    性能分析命令：
+    网络：ifconfig， ip看网络配置，netstat和sar分析网络吞吐量， tcmdump抓包给wireshark分析，还要就是traceroute
+    CPU/内存：dmidecode看硬件信息，top/htop/ps看进程占用，vmstat看CPU/内存/IO的分析，还有strace分析进程的调用情况，还有就是free和pmap看内存信息
+    IO： fdisk -l 和 df 查看磁盘基本信息，iostat可以看IO的吞吐量和效率，iotop的话可以定位哪个进程IO开销大
+    
 2. 说一说linux目录结构
     /bin    系统的一些指令
     /boot   启动Linux时使用的一些核心文件
@@ -205,3 +206,192 @@
     - 设置断点：break
     - 调试命令：start，run，continue，print
 24. 关于系统IO以及内存管理的在操作系统里复习
+
+#### 3. 网络性能分析
+1. 网络性能指标
+   - 带宽，表示链路的最⼤传输速率，单位是 b/s （⽐特 / 秒），带宽越⼤，其传输能⼒就越强。
+   - 延时，表示请求数据包发送后，收到对端响应，所需要的时间延迟。不同的场景有着不同的含义，⽐如可以表示建⽴ TCP 连接所需的时间延迟，或⼀个数据包往返所需的时间延迟。
+   - 吞吐率，表示单位时间内成功传输的数据量，单位是 b/s（⽐特 / 秒）或者 B/s（字节 / 秒），吞吐受带宽限制，带宽越⼤，吞吐率的上限才可能越⾼。
+   - PPS，全称是 Packet Per Second（包 / 秒），表示以⽹络包为单位的传输速率，⼀般⽤来评估系统对于⽹络的转发能⼒。
+   - ⽹络的可⽤性，表示⽹络能否正常通信；
+   - 并发连接数，表示 TCP 连接数量；
+   - 丢包率，表示所丢失数据包数量占所发送数据组的⽐率；
+   - 重传率，表示重传⽹络包的⽐例；
+2. ping
+    探测网络的连通性,能获得本次连接的TTL, 往返时间延迟（RTT 时间），丢包情况，以及访问的域名所对应的 IP 地址（使用 DNS 域名解析）
+    ping -c 4 www.baidu.com
+3. ifconfig
+    网络接口的统计信息
+    - ⽹⼝的 IP 地址、⼦⽹掩码、 MAC 地址、广播地址
+    - ⽹⼝的连接状态标志：RUNNING
+    - MTU ⼤⼩。默认值是 1500 字节
+    - ⽹路包收发的统计信息
+      - TX发送，RX接受
+      - errors 表示发⽣错误的数据包数，⽐如校验错误、帧同步错误等；
+      - dropped 表示丢弃的数据包数，即数据包已经收到了 Ring Buffer，但因为系统内存不⾜等原因⽽发⽣的丢包；
+      - overruns 表示超限数据包数，即⽹络接收/发送速度过快，导致 Ring Buffer 中的数据包来不及处理，⽽导致的丢包，因为过多的数据包挤压在 Ring Buffer，这样 Ring Buffer 很容易就溢出了；
+      - carrier 表示发⽣ carrirer 错误的数据包数，⽐如双⼯模式不匹配、物理电缆出现问题等；
+      - collisions 表示冲突、碰撞数据包数；
+4. netstat， ss(性能更好)
+    查看网络整体状况：socket、⽹络协议栈、⽹⼝以及路由表的信息
+   - netstat 默认显示连接的套接字数据
+        socket 的状态（State）、接收队列（Recv-Q）、发送队列（Send-Q）、本地地址（Local Address）、远端地址（Foreign Address）、进程 PID 和进程名称（PID/Program name）
+        - Established ：
+            Recv-Q 表示 socket 缓冲区中还没有被应⽤程序读取的字节数；
+            Send-Q 表示 socket 缓冲区中还没有被远端主机确认的字节数；
+        - Listen:
+            Recv-Q 表示全连接队列的⻓度；
+            Send-Q 表示全连接队列的最⼤⻓度；
+   - netstat -i 显示网络接口信息
+        包括网络接口名称（Iface）、MTU，以及一系列接收（RX-）和传输（TX-）的指标。其中 OK 表示传输成功的包，ERR 是错误包，DRP 是丢包，OVR 是超限包。
+   - netstat -s 网络协议栈信息
+        TCP 协议的主动连接（active connectionsopenings）、被动连接（passive connection openings）、失败重试（failed connection attempts）、发送（segments send out）和接收（segments received）的分段数量
+   - netstat -r 显示路由表信息 
+5. netcat
+        排查网络故障,主要被用来构建网络连接,作为服务端时接受连接，作为客户端时发起连接
+         nc -l 0.0.0.0 12345 
+         nc -p 1234 127.0.0.1 12345
+6. tcmdump
+    网络抓包工具,抓包后交给wireshark排查网络错误
+    也可以结合netcat使用
+7. sar
+    历史数据统计工具，包括 CPU、内存、磁盘 I/O、网络、进程、系统调用等等信息。可以用来查看⽹络吞吐率和 PPS 。
+       - sar -n DEV 10，显示⽹⼝的统计数据；
+            分析网卡接收和发送的网络吞吐量
+            xpck/s 和 txpck/s 分别是接收和发送的 PPS，单位为包 / 秒。
+            rxkB/s 和 txkB/s 分别是接收和发送的吞吐率，单位是 KB/ 秒。
+            rxcmp/s 和 txcmp/s 分别是接收和发送的压缩数据包数，单位是包 / 秒。
+       - sar -n EDEV 10，显示关于⽹络错误的统计数据；
+            错误包和丢包情况分析，定位问题
+            rxerr/s / txerr/s：每秒钟接收/发送的坏数据包
+            coll/s：每秒冲突数
+            rxdrop/s：因为缓冲充满，每秒钟丢弃的已接收数据包数
+            txdrop/s：因为缓冲充满，每秒钟丢弃的已发送数据包数
+       - sar -n TCP 10，显示 TCP 的统计数据
+            active/s：新的 TCP 主动连接（也就是 socket 中的 connect() 事件），单位是：连接数/s。
+            passive/s：新的 TCP 被动连接（也就是 socket 中的 listen() 事件）。
+            iseg/s：接收的段（传输层以段为传输单位），单位是：段/s
+            oseg/s：发送的段。
+       - sar TCP -n IP：IP 数据报统计信息。
+       - sar TCP -n EIP：IP 错误统计信息。
+       - sar TCP -n ETCP：TCP 错误统计信息。
+       - sar TCP -n SOCK：套接字使用。
+8. ethtool
+     查看带宽，单位为bit而不是byte，千兆网卡，万兆网卡
+        ethtool eth0 | grep Speed
+        Speed: 1000Mb/s
+9. traceroute
+    排查网络问题，显示数据包到达目标主机所经过的路径（路由器或网关的 IP 地址）。如果发现网络不通，我们可以通过这个命令来进一步判断是主机的问题还是网关的问题。
+    通过发送一系列的探测数据包，同时递增TTL来探测路径。如果中间设备的防火墙拦截响应报文或者超时的话就会显示为*
+    traceroute www.baidu.com
+10. ip
+    新的强大的网络配置工具用来替换ifconfig，netstat
+    查看接口:ip link show
+    显示接口：ip addr show
+    显示路由表: ip route list
+
+#### 4. CPU性能分析
+1. lscpu， cat /proc/cpuinfo
+    查看CPU信息
+2. dmidecode
+    查看系统硬件信息，如BIOS、系统、主板、处理器、内存、缓存等等
+3. top / htop
+    查看进程状态信息
+   - load average
+        三个数字分别表示最近 1 分钟，5 分钟和 15 分钟的负责，数值越大负载越重。一般要求不超过核数，比如对于单核情况要 < 1。如果机器长期处于高于核数的情况，说明机器 CPU 消耗严重了
+   - %Cpu(s)
+        表示当前 CPU 的使用情况，如果要查看所有核（逻辑核）的使用情况，可以按下数字 “1” 查看
+        - us    用户空间占用 CPU 时间比例
+        - sy    系统占用 CPU 时间比例
+        - id    CPU 空闲时间比
+        - wa    IO等待时间比（IO等待高时，可能是磁盘性能有问题了）
+        - hi    硬件中断
+        - si    软件中断
+   - 每个进程的使用情况
+        top -p pid
+4. ps
+    查看进程状态信息
+    watch -n 1 "ps aux"
+5. vmstat
+    虚拟内存统计，包括CPU, 内存, IO
+    - procs：r这一列显示了多少进程在等待cpu，b列显示多少进程正在不可中断的休眠（等待IO）。
+    - memory：swapd列显示了多少块被换出了磁盘（页面交换），剩下的列显示了多少块是空闲的（未被使用），多少块正在被用作缓冲区，以及多少正在被用作操作系统的缓存。
+    - swap：显示交换活动：每秒有多少块正在被换入（从磁盘）和换出（到磁盘）。
+    - io：显示了多少块从块设备读取（bi）和写出（bo）,通常反映了硬盘I/O。
+    - system：显示每秒中断(in)和上下文切换（cs）的数量。
+    - cpu：显示所有的cpu时间花费在各类操作的百分比，包括执行用户代码（非内核），执行系统代码（内核），空闲以及等待IO。
+    
+    内存不足的表现：free  memory急剧减少，回收buffer和cacher也无济于事，大量使用交换分区（swpd）,页面交换（swap）频繁，读写磁盘数量（io）增多，缺页中断（in）增多，上下文切换（cs）次数增多，等待IO的进程数（b）增多，大量CPU时间用于等待IO（wa）
+6. dstat
+    系统监控，pu使用情况，磁盘io情况，网络发包情况和换页
+7. pidstat
+    进程统计系统信息，包括 CPU、内存和 IO 
+    pidstat -u -p pid [times]
+8. strace
+    分析进程的系统调用情况，可以看进程都调用了哪些库和哪些系统调用
+    还可以 attach（附着）到一个正在运行的进程上进行分析
+    strace -p pid
+    分析问题，从而定位到问题
+
+#### 5. 内存性能分析
+0. 查看系统内存用 free -h，分析进程内存占用用 ps 或者 top（首选 ps），深入分析选择 pmap
+1. /proc/meminfo
+    内存配置信息
+   - MemTotal：系统总内存，由于 BIOS、内核等会占用一些内存，所以这里和配置声称的内存会有一些出入，比如我这里配置有 2G，但其实只有 1.95G 可用。
+   - MemFree：系统空闲内存。
+   - MemAvailable：应用程序可用内存。有人会比较奇怪和 MemFree 的区别，可以从两个层面来区分，MemFree 是系统层面的，而 MemAvailable 是应用程序层面的。系统中有些内存虽然被使用了但是有一部分是可以回收的，比如 Buffers、Cached 及 Slab 这些内存，这部分可以回收的内存加上 MemFree 才是 MemAvailable 的内存值，这是内核通过特定算法算出来的，是一个估算值。
+   - Buffers：缓冲区内存
+   - Cached：缓存
+2. free
+   MemTotal = used + free + buff/cache（单位 K)
+   free -h
+     free 很小，buff/cache 却很大，这是 Linux 的内存设计决定的，Linux 的想法是内存闲着反正也是闲着，不如拿出来做系统缓存和缓冲区，提高数据读写的速率。但是当系统内存不足时，buff/cache 会让出部分来，非常灵活的操作。
+3. dmidecode
+    dmidecode -t memory
+4. top/htop/ps
+    查看进程内存使用情况
+    top后按F，s确认
+    - VIRT：virtual memory usage，进程占用的虚拟内存大小。
+    - RES：resident memory usage，进程常驻内存大小，也就是实际内存占用情况，一般我们看进程占用了多少内存，就是看的这个值。
+    - SHR：shared memory，共享内存大小，不常用。s
+5. pmap
+    查看进程的内存映像信息，能够查看进程在哪些地方用了多少内存
+    pmap -x pid 
+    - Address：占用内存的文件的内存起始地址。
+    - Kbytes：占用内存的字节数。    
+    - RSS：实际占用内存大小。
+    - Dirty：脏页大小。
+    - Mapping：占用内存的文件，[anon] 为已分配的内存，[stack] 为程序堆栈
+     pmap -x pid | tail -1 
+
+#### 6. IO性能分析
+0. fdisk -l 和 df 查看磁盘基本信息，iostat -d 查看磁盘 IOPS 和吞吐量，iostat -x 结合 vmstat 查看磁盘的繁忙程度和处理效率，iotop定位哪个进程IO开销较大
+1. 存储可以概括为磁盘，内存，缓存，三者读写的性能差距非常大，磁盘读写是毫秒级的（一般 0.1-10ms），内存读写是微妙级的（一般 0.1-10us），cache 是纳秒级的（一般 1-10ns）。但这也是牺牲其他特性为代价的，速度快的，价格越贵，容量也越小。
+2. fdisk
+    查看磁盘信息，包括磁盘容量，扇区大小，IO 大小等信息
+    fdisk -l
+3. df
+    查看磁盘使用情况，通常看磁盘使用率
+4. vmstat
+   - b 值：表示因为 IO 阻塞排队的任务数
+   - bi 和 bo 值：表示每秒读写磁盘的块数，bi（block in）是写磁盘，bo（block out）是读磁盘。
+   - wa 值：表示因为 IO 等待（wait）而消耗的 CPU 时间比例。
+   一般这几个值偏大，都意味着系统 IO 的消耗较大，对于读请求较大的服务器，b、bo、wa 的值偏大，而写请求较大的服务器，b、bi、wa 的值偏大。
+5. iostat
+    iostat 是专业分析 IO 性能的工具，可以方便查看 CPU、网卡、tty 设备、磁盘、CD-ROM 等等设备的信息
+   - iostat -c 查看部分 CPU 使用情况
+         %iowait：CPU 等待IO完成的时间的百分比
+         %idle：CPU空闲时间百分比
+         如果%iowait的值过高，表示硬盘存在I/O瓶颈，%idle值高，表示CPU较空闲，如果%idle值高但系统响应慢时，有可能是CPU等待分配内存，此时应加大内存容量。%idle值如果持续低于10，那么系统的CPU处理能力相对较低，表明系统中最需要解决的资源是CPU
+   - iostat -d 查看磁盘使用情况
+        tps：设备每秒的传输次数（transfers per second），也就是读写次数。
+        kB_read/s 和 kB_wrtn/s：每秒读写磁盘的数据量。
+        kB_read 和 kB_wrtn：读取磁盘的数据总量
+   - iostat -x 查看磁盘详细信息
+        await：平均每次磁盘读写的等待时间（ms）。
+        svctm：平均每次磁盘读写的服务时间（ms）。
+        %util：一秒钟有百分之多少的时间用于磁盘读写操作。
+        %util用于衡量IO的繁忙程度，如果vmstat 的 b 参数（等待 IO 的进程数）和 wa 参数（IO 等待所占 CPU 时间百分比）来看，如果 wa > 30% 也说明 IO 较为繁忙
+        await：衡量 IO 的响应速度，图个和svctm差不多说明响应较快
+6. 查看每个进程的IO开销
+    iotop 定位具体哪个进程的 IO 开销比较大
