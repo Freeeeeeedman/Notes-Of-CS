@@ -101,22 +101,63 @@
         empty()	判断是否为空，队列为空，返回true O(1)
 6. deque
    - 简介
-        #include<deque>
-        双端队列，首尾都可以插入和删除
+          #include<deque>
+          双端队列，首尾都可以插入和删除
    - 方法
-    push_back(x)/push_front(x)	把x压入后/前端
-    back()/front()	访问(不删除)后/前端元素
-    pop_back() pop_front()	删除后/前端元素
-    erase(iterator it)	删除双端队列中的某一个元素
-    erase(iterator first,iterator last)	删除双端队列中[first,last）中的元素
-    empty()	判断deque是否空
-    size()	返回deque的元素数量
-    clear()	清空dequ
+          push_back(x)/push_front(x)	把x压入后/前端
+          back()/front()	访问(不删除)后/前端元素
+          pop_back() pop_front()	删除后/前端元素
+          erase(iterator it)	删除双端队列中的某一个元素
+          erase(iterator first,iterator last)	删除双端队列中[first,last）中的元素
+          empty()	判断deque是否空
+          size()	返回deque的元素数量
+          clear()	清空deque
    - 排序
-    deque可以排序
-    sort(d.begin(),d.end())
-    //从大到小排序
-    sort(q.begin(), q.end(), greater());
+          deque可以排序
+          sort(d.begin(),d.end())
+          //从大到小排序
+          sort(q.begin(), q.end(), greater());
+7. priority_queue
+   - 简介
+          #include <queue>
+          priority_queue<int> pq;
+   - 方法
+          top()	访问队首元素
+          push()	入队
+          pop()	堆顶（队首）元素出队
+          size()	队列元素个数
+          empty()	是否为空
+   - 设置优先级
+     - priority_queue<int, vector<int>, less<int> >pq;//最后两个>之间要有空格
+     - 第二个参数
+          vector< int > 是用来承载底层数据结构堆的容器，若优先队列中存放的是double型数据，就要填vector< double >
+     - 第三个参数
+          大顶堆：less< int > 表示数字大的优先级大，堆顶为最大的数字
+          小顶堆：greater< int >表示数字小的优先级大，堆顶为最小的数字
+     - 自定义排序
+          大顶堆: < 小于号
+          小顶堆: > 大于号
+          ```
+          struct cmp1
+          {
+               bool operator()(int x,int y)
+               {
+                    return x>y;//小的优先级高 ,从小到大排 
+               }
+          }; 
+          struct cmp2
+          {
+               bool operator()(const int x,const int y)
+               {
+                    return a[x]>a[y];
+               }
+          }; 
+          priority_queue<int,vector<int>,cmp1>pq1;
+          priority_queue<int,vector<int>,cmp2>pq2;
+          ```
+     - **sort的排序规则和优先队列的排序规则是相反的**
+
+         
 
 
 
