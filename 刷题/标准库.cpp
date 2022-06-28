@@ -3,6 +3,9 @@
 #include <map>
 #include <string>
 #include <array>
+#include <tuple>
+// #include <numeric>
+#include <algorithm>
 using namespace std;
 
 int main() {
@@ -48,8 +51,25 @@ int main() {
     // }
     
     // array<int, 100> arr({123,4675,123});
-    array<int, 100> arr{123, 465, 12};
-    arr.front() = 2;
-    cout << arr.front() << endl;
+    // array<int, 100> arr{123, 465, 12};
+    // arr.front() = 2;s
+    // cout << arr.front() << endl;
 
+    // tuple<int, int, int, int> t1 = {1, 2, 3, 4};
+    // cout << get<0>(t1) << endl;
+    // int a, b, c, d;
+    // tie(a, b, c, d) = t1;
+    // cout << a << b << c << d;
+
+    vector<int> a = {1, 2, 3, 4};
+    int c = 0;
+    // c = accumulate(a.begin(), a.end(), 0);
+    // cout << c << endl;
+    fill(a.begin(), a.end(), 5);
+    for(const auto & d : a){
+        cout << d << endl;
+    }
+    int e = 0;
+    e = is_sorted(a.begin(), a.end());
+    cout << e << endl;
 }

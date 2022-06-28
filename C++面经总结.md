@@ -329,6 +329,35 @@ unordered_multiset ： 元素无序可以出现多次
           array1.swap(array2)	交换 array1 和 array2 容器中的所有元素，但前提是它们具有相同的长度和类型
     - 排序
           sort(a.begin(), a.end());   
+16. tuple
+    - 简介
+          #include <tuple>
+          tuple模板是pair的泛化，可以封装不同类型任意数量的对象。
+          可以把tuple理解为pair的扩展，tuple可以声明二元组，也可以声明三元组。
+          tuple可以等价为结构体使用
+    - 声明
+          tuple<int, int, string> t1;
+          tuple<int, int, int> t1(1, 2, 3, 4);
+    - 获取值
+          cout << get<0>(t1) << endl;
+          int a, b, c, d;
+          tie(a, b, c, d) = t1;
+          cout << a << b << c << d;
+17. STL函数
+    beg为序列的初始地址，end为序列的尾地址
+    - accumulate(beg,end,init)
+        #include <numeric>
+        O(n)
+        对一个序列的元素求和, 求和不包括end,init为对序列元素求和的初始值
+    - fill(beg,end,num)  
+        std内
+        O(n)
+        对一个序列进行初始化赋值
+    - is_sorted(beg,end)
+        #include <is_sorted>  
+        O(n)
+        判断序列是否有序，返回bool值   
+    -      
 #### 3. C++新特性
 
 #### 4. C++泛型编程
