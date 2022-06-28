@@ -156,24 +156,179 @@
           priority_queue<int,vector<int>,cmp2>pq2;
           ```
      - **sort的排序规则和优先队列的排序规则是相反的**
-
-         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+8. map
+   - 简介
+          #include <map>
+          映射,键值对，key-value
+          有序且不重复，map会按照键的顺序从小到大自动排序
+   - 定义
+          map<string, string> mp;
+          map<string, int> mp;
+   - 方法
+          mp.find(key)	返回键为key的映射的迭代器 O(logN) 注意：用find函数来定位数据出现位置，它返回一个迭代器。当数据存在时，返回数据所在位置的迭代器，数据不存在时，返回mp.end()
+          mp.erase(it)	删除迭代器对应的键和值O(1)
+          mp.erase(key)	根据映射的键删除键和值 O(logN)
+          mp.erase(first,last)	删除左闭右开区间迭代器对应的键和值 O(last-first)
+          mp.size()	返回映射的对数 O(1)
+          mp.clear()	清空map中的所有元素 O(N)
+          mp.insert()	插入元素，插入时要构造键值对
+          mp.empty()	如果map为空，返回true，否则返回false
+          mp.begin()	返回指向map第一个元素的迭代器（地址）
+          mp.end()	返回指向map尾部的迭代器（最后一个元素的下一个地址）
+          mp.lower_bound()	返回一个迭代器，指向键 >= key的第一个元素
+          mp.upper_bound()	返回一个迭代器，指向键 > key的第一个元素
+   - 注意
+     - 赋值方式
+          mp["学习"] = "看书";
+          mp.insert(pair<string,string>("fruit","水果"));
+          mp.insert({"hahaha","wawawa"});
+     - 访问
+          下标访问：mp["菜哇菜"] = "强哇强";
+          迭代器访问：map<string,string>::iterator it;
+                    for(it = mp.begin(); it != mp.end(); it++) {
+                         cout << it->first;
+                         cout << it->end;
+                    }
+          智能指针访问：for(auto i : mp)
+          指定元素访问:map<char,int>::iterator it = mp.find('a');
+                    cout << it -> first << " " <<  it->second << "\n";
+9. mutimap, unordered_map
+10. set
+    - 简介
+          #include<set>
+          set<int> se;
+          有序且不重复，由小到大排序
+    - 方法
+          s.begin()	返回set容器的第一个元素的地址（迭代器）
+          s.end()	返回set容器的最后一个元素的地址（迭代器）
+          s.rbegin()	返回逆序迭代器，指向容器元素最后一个位置
+          s.rend()	返回逆序迭代器，指向容器第一个元素前面的位置
+          s.clear()	删除set容器中的所有的元素,返回unsigned int类型O(N)
+          s.empty()	判断set容器是否为空
+          s.insert()	插入一个元素
+          s.size()	返回当前set容器中的元素个数O(1)
+          erase(iterator)	删除定位器iterator指向的值
+          erase(first,second）	删除定位器first和second之间的值
+          erase(key_value)	删除键值key_value的值
+          查找	
+          s.find(元素)	查找set中的某一元素，有则返回该元素对应的迭代器，无则返回结束迭代器
+          s.lower_bound(k)	返回大于等于k的第一个元素的迭代器
+          s.upper_bound(k)	返回大于k的第一个元素的迭代器
+    - 访问
+        - 迭代器访问
+        - 智能指针访问
+        - 访问最后一个元素：
+          set<int>::iterator iter = s.end();
+          iter--;
+          cout<<(*iter)<<endl; 
+    - 重载<运算符
+          ```
+          struct cmp {
+               bool operator () (const int& u, const int& v) const {
+                    return u < v;
+               }
+          };
+          set<int, cmp> se;
+          ```
+11. multiset:元素可以重复，且元素有序
+unordered_set ：元素无序且只能出现一次
+unordered_multiset ： 元素无序可以出现多次
+12. pair
+    - 简介
+          #include <utility>
+          pair只含有两个元素，可以看作是只有两个元素的结构体。
+    - 作用
+          作为map键值对进行插入
+    - 定义
+          pair<string,int> p("wangyaqi",1);//带初始值的
+          pair<string,int> p;//不带初始值的
+          p = {"wang",18};//赋值
+    - 访问
+          pair<int,int>p[20];
+          cout << p[i].first << " " << p[i].second;    
+13. string
+    - 简介
+          #include <string>
+     字符串
+    - 定义
+          string str1; //生成空字符串
+          string str2("123456789"); //生成"1234456789"的复制品 
+          string str3("12345", 0, 3);//结果为"123" ，从0位置开始，长度为3
+          string str4("123456", 5); //结果为"12345" ，长度为5
+          string str5(5, '2'); //结果为"22222" ,构造5个字符'2'连接而成的字符串
+          string str6(str2, 2); //结果为"3456789"，截取第三个元素（2对应第三位）到最后
+    - 特性
+          支持比较运算符，从前往后逐一比较
+          支持+运算符，代表拼接字符串
+    - string与C语言字符串（C-string）的区别
+      - string是C++的一个类，专门实现字符串的相关操作。具有丰富的操作方法，数据类型为string，字符串结尾没有\0字符
+      - C-string，C语言中的字符串，用char数组实现，类型为const char *,字符串结尾以\0结尾
+      - string转char[]
+          string s = "xing ma qi";
+          char s2[] = s.c_str();
+    - 方法
+          s.size()  返回string对象的字符个数
+          s.push_back()	在末尾插入一个字符
+          s.insert(pos,element)在pos位置插入element, s.insert(0, ‘1’)
+          s.append(str)	在s字符串结尾添加str字符串
+          erase(iterator p)	删除字符串中p所指的字符
+          erase(iterator first, iterator last)	删除字符串中迭代器区间[first,last)上所有字符
+          erase(pos, len)	删除字符串中从索引位置pos开始的len个字符
+          clear()	删除字符串中所有字符, 实质是把字符串空间首字符设置为了“\0”
+          s.replace(pos,n,str)	把当前字符串从索引pos开始的n个字符替换为str
+          s.replace(it1,it2,str)	把当前字符串[it1,it2)区间替换为str
+          tolower(s[i])	转换为小写
+          toupper(s[i])	转换为大写
+          s.substr(pos,n)	截取从pos索引开始的n个字符
+          s.find (str, pos)	在当前字符串的pos索引位置(默认为0)开始，查找子串str，返回找到的位置索引，-1表示查找不到子串
+          s.find (c, pos)	在当前字符串的pos索引位置(默认为0)开始，查找字符c，返回找到的位置索引，-1表示查找不到字符
+    - 排序：sort(s.begin(),s.end());  //按ASCII码排序
+14. bitset
+    - 简介
+          #include <bitset>
+          类似数组，并且每一个元素只能是0或1，每个元素只用1bit空间
+    - 声明
+          bitset < n >a;	a有n位，每位都为0     
+          bitset < n >a(s);	a是string对象s中含有的位串的副本
+          bitset<4> bitset1;　　  //无参构造，长度为４，默认每一位为0
+          bitset<9> bitset2(12);　//长度为9，二进制保存，前面用0补充
+          bitset<10> bitset3(string("100101));　　//长度为10，前面用0补充
+15. array
+    - 简介
+          #include <array>
+          array是C++11新增的容器，效率与普通数据相差无几，比vector效率要高，自身添加了一些成员函数。
+          和其它容器不同，array 容器的大小是固定的，无法动态的扩展或收缩，只允许访问或者替换存储的元素。
+          array的使用要在std命名空间里
+    - 声明
+          array<int, 100> a;元素的值不确定
+          array<int, 100> a{};元素的值为0
+          array<int, 100> a{1, 2, 3};
+          array<int, 100> a({1, 2, 3});
+          array<int, 100> a = {1, 2, 3};
+          array<int, 100> a = {1, 2, 3};
+    - 访问
+      - 下标访问
+      - 智能指针访问
+      - 迭代器访问
+      - at()成员函数访问
+          array<int, 4> a = {1, 2, 3, 4};
+          int res = a.at(1) + a.at(2);下标为1+下标为2
+    - 方法
+          begin()	返回容器中第一个元素的访问迭代器（地址）
+          end()	返回容器最后一个元素之后一个位置的访问迭代器（地址）
+          rbegin()	返回最后一个元素的访问迭代器（地址）
+          rend()	返回第一个元素之前一个位置的访问迭代器（地址）
+          size()	返回容器中元素的数量，其值等于初始化 array 类的第二个模板参数N
+          empty()	判断容器是否为空
+          at(n)	返回容器中 n 位置处元素的引用，函数会自动检查 n 是否在有效的范围内，如果不是则抛出 out_of_range 异常
+          front()	返回容器中第一个元素的直接引用，函数不适用于空的 array 容器。引用可以作为左值
+          back()	返回容器中最后一个元素的直接引用，函数不适用于空的 array 容器。
+          data()	返回一个指向容器首个元素的指针。利用该指针，可实现复制容器中所有元素等类似功能
+          fill(x)	将 x 这个值赋值给容器中的每个元素,相当于初始化。
+          fill(a.begin(), a.end(), x)
+          array1.swap(array2)	交换 array1 和 array2 容器中的所有元素，但前提是它们具有相同的长度和类型
+    - 排序
+          sort(a.begin(), a.end());   
 #### 3. C++新特性
 
 #### 4. C++泛型编程
