@@ -61,15 +61,42 @@ int main() {
     // tie(a, b, c, d) = t1;
     // cout << a << b << c << d;
 
-    vector<int> a = {1, 2, 3, 4};
-    int c = 0;
+    // vector<int> a = {1, 2, 3, 4};
+    // int c = 0;
     // c = accumulate(a.begin(), a.end(), 0);
     // cout << c << endl;
-    fill(a.begin(), a.end(), 5);
-    for(const auto & d : a){
-        cout << d << endl;
+    // fill(a.begin(), a.end(), 5);
+    // for(const auto & d : a){
+    //     cout << d << endl;
+    // }
+    // int e = 0;
+    // e = is_sorted(a.begin(), a.end());
+    // cout << e << endl;
+    // c = lower_bound(a.begin(), a.end(), 3) - a.begin();
+    // cout << c << endl;
+    // c = *max_element(a.begin(), a.end());
+    // cout << c << endl;
+    // c = max(1, 2);
+    // cout << c << endl;
+    // reverse(a.begin(), a.end());
+    // for(const auto &t : a) {
+    //     cout << t << endl;
+    // }
+    // array<int, 10> arr = {0, 1, 3, 6, 4, 8, 9};
+    // sort(arr.begin(), arr.end());
+    // for(auto it = arr.begin(); it != arr.end(); it++) {
+    //     cout << *it << endl;
+    // }
+    // double a = 12312341.123;
+    // string str = to_string(a);
+    // char ch[] = {"21312"};
+    // cout << sizeof(ch) / sizeof(ch[0]) << endl;
+    vector<int> a = {1, 2, 3, 3, 4, 4, 5, 6, 7, 7, 9};
+    auto it = unique(a.begin(), a.end());
+    cout << *it << endl;
+    a.erase(it, a.end());
+    for(auto c : a) {
+        cout << c << ' ';
     }
-    int e = 0;
-    e = is_sorted(a.begin(), a.end());
-    cout << e << endl;
+
 }
