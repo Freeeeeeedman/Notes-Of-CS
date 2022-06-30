@@ -46,7 +46,7 @@ inline complex &complex::operator+=(const complex &r)
     return __doapl(this, r);
 }
 
-#include <iostream.h>
+#include <iostream>
 inline ostream&
 operator <<(ostream& os,const complex&x)
 {
