@@ -88,6 +88,41 @@ int Test::n_ = 114514;
 void Test::printN() {
     cout << n_ << endl;
 }
+
+int sum(int a, int b) {
+    return a + b;
+}
+
+int sum(int a) {
+    return a + 3;
+}
+
+template <class T>
+T max_(T a, T b) {
+    return a > b ? a : b;
+}
+
+
+class Complex {
+    private:
+        double real_;
+        double imag_;
+    
+    public:
+        Complex(double real, double imag): real_(real), imag_(imag){}
+        ~Complex(){}
+        const double &getReal() const{return real_;}
+        const double &getImag() const{return imag_;} 
+        Complex operator+(const Complex &a);
+
+};
+
+inline Complex
+Complex::operator+(const Complex &a) {
+    return Complex(a.real_ + real_, a.imag_ + imag_);
+}
+
+
 int main() {
 
     #ifdef DEBUG
@@ -148,21 +183,14 @@ int main() {
 
     #endif
 
+    Complex c1(1, 2);
+    Complex c2(2, 3);
+    Complex c3 = c1 + c2;
+    double real = c3.getReal();
+    cout << real << endl;
+    
 
 
-}
-
-int sum(int a, int b) {
-    return a + b;
-}
-
-int sum(int a) {
-    return a + 3;
-}
-
-template <class T>
-T max_(T a, T b) {
-    return a > b ? a : b;
 }
 
 
