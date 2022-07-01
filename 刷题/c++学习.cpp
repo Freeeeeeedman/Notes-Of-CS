@@ -88,6 +88,89 @@ int Test::n_ = 114514;
 void Test::printN() {
     cout << n_ << endl;
 }
+
+int sum(int a, int b) {
+    return a + b;
+}
+
+int sum(int a) {
+    return a + 3;
+}
+
+template <class T>
+T max_(T a, T b) {
+    return a > b ? a : b;
+}
+
+
+class Complex {
+    private:
+        double real_;
+        double imag_;
+    
+    public:
+        Complex(double real, double imag): real_(real), imag_(imag){}
+        ~Complex(){}
+        const double &getReal() const{return real_;}
+        const double &getImag() const{return imag_;} 
+        Complex operator+(const Complex &a);
+        friend Complex operator-(const Complex &a, const Complex &b);
+        friend ostream& operator<< (ostream &output, const Complex &a);
+        operator double() const; 
+};
+
+inline Complex
+Complex::operator+(const Complex &a) {
+    return Complex(a.real_ + this->real_, a.imag_ + imag_);
+}
+
+Complex operator-(const Complex &a, const Complex &b) {
+    return Complex(a.real_ - b.real_, a.imag_ - b.imag_);
+}
+
+ostream& operator<<(ostream &output, const Complex &a) {
+    output << "real = " << a.real_ << endl;
+    output << "imag = " << a.imag_ << endl;
+    return output;
+}
+
+inline 
+Complex::operator double() const {
+    return this->real_;
+}
+
+class B0 {
+    private:
+        int b0_;
+        virtual void printB() {
+            cout << "B0::printB()" << endl;
+        }        
+    public:
+        B0(int b0): b0_(b0){} 
+
+        virtual ~B0() {
+            cout << "调用了B0的析构函数" << endl;
+        }
+        virtual void show() = 0;
+};
+
+class B1:public B0{
+    private:
+        int b1_;
+    public:
+        B1(int b0, int b1):B0(b0), b1_(b1){} 
+        virtual void printB() {
+            cout << "B1::printB()" << endl;
+        }
+        virtual ~B1() {
+            cout << "调用了B1的析构函数" << endl;            
+        }
+        virtual void show() {
+            cout << "show" << endl;
+        }    
+};
+
+
 int main() {
 
     #ifdef DEBUG
@@ -146,23 +229,36 @@ int main() {
         // p[10] = 100;
         // delete []p;
 
+        // Complex c1(1, 2);
+        // Complex c2(2, 3);
+        // Complex c3 = c1 + c2;
+        // double real = c3.getReal();
+        // cout << real << endl;
+        // Complex c4 = c1 - c2;
+        // double real4 = c4.getReal();
+        // cout << real4 << endl;
+        // cout << c1 << endl;
+
+        // Complex c5(1.2, 2.3);
+        // double a = 1.7 + 2 + c5;
+        // cout << a << endl;
+
+        // B0 b0(1);
+        // B1 b1(1, 0);
+        // b0.printB();
+        // b1.printB(); 
+
+        // B0 *p;
+        // p = new B1(1, 0);
+        // delete p;                   
+
+
+
     #endif
+        B1 b1(1, 2);
+        b1.printB();
+    // b1.show();
 
-
-
-}
-
-int sum(int a, int b) {
-    return a + b;
-}
-
-int sum(int a) {
-    return a + 3;
-}
-
-template <class T>
-T max_(T a, T b) {
-    return a > b ? a : b;
 }
 
 

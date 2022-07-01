@@ -1,5 +1,5 @@
 #include "student.h"
-
+int a;
 void student::setData(int id, string name, int age) {
     id_ = id;
     name_ = name;

@@ -3,6 +3,8 @@
 
 #include <bits/stdc++.h>
 using namespace std;
+extern int a;
+
 class student {
     private:
         int id_;
