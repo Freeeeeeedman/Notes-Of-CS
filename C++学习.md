@@ -1,3 +1,20 @@
+#### C++基础
+1. atexit函数
+   - 当进程正常退出时，将调用使用atexit注册过的函数
+   - 注册过的函数的执行顺序就像压栈一样，先进后出，也就是最先注册的最后执行，最后注册的最先执行
+   - 必须是进程正常退出时才会调用atexit注册过的函数，例如进程调用_exit或_Exit退出时就不会调用atexit注册过的函数
+2. __attribute__详解
+   - attribute是一个编译属性，用于向编译器描述特殊的标识、错误检查或高级优化
+   - attribute可以设置函数属性（Function Attribute ）、变量属性（Variable Attribute ）和类型属性（Type Attribute)
+   - 例__attribute__ ((attribute-list))
+     - format
+            使编译器检查函数声明和函数实际调用参数之间的格式化字符串是否匹配
+     - constructor与destructor
+            constructor属性可以指定函数在main函数执行之前进行调用，与之对应destructor可以指定某个函数在main函数执行结束之后再执行
+     - objc_subclassing_restricted
+            指明当前类型不能有子类，相当于final关键字
+
+
 #### C++标准库
 1. 万用头文件
      #include<bits/stdc++.h>
@@ -392,3 +409,13 @@ unordered_multiset ： 元素无序可以出现多次
           vector<int> a = {1, 2, 3, 3, 4, 4, 5, 6, 7, 7, 9};
           auto it = unique(a.begin(), a.end());it指向9后面的一位而不是9
           a.erase(it, a.end());删除重复元素
+
+#### C++11 新特性
+1. final 关键字
+   - 禁止继承：c++11特性中，将类标记为final，意味着无法继承
+            class test final
+            {
+            ......
+            };
+   - 禁止重写方法：当方法被标记为final时，在子类中无法重写该方法
+   - final可以在派生过程中任意地阻止一个接口的可重写性，这就给面向对象带来了更大的控制力

@@ -114,18 +114,13 @@ class Complex {
         const double &getReal() const{return real_;}
         const double &getImag() const{return imag_;} 
         Complex operator+(const Complex &a);
-<<<<<<< HEAD
         friend Complex operator-(const Complex &a, const Complex &b);
         friend ostream& operator<< (ostream &output, const Complex &a);
         operator double() const; 
-=======
-
->>>>>>> b470a52c372e672cc5775f3792c04e9023976f23
 };
 
 inline Complex
 Complex::operator+(const Complex &a) {
-<<<<<<< HEAD
     return Complex(a.real_ + this->real_, a.imag_ + imag_);
 }
 
@@ -175,11 +170,9 @@ class B1:public B0{
         }    
 };
 
-=======
     return Complex(a.real_ + real_, a.imag_ + imag_);
 }
 
->>>>>>> b470a52c372e672cc5775f3792c04e9023976f23
 
 int main() {
 
