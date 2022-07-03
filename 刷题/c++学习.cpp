@@ -154,24 +154,22 @@ class B0 {
         virtual void show() = 0;
 };
 
-class B1:public B0{
-    private:
-        int b1_;
-    public:
-        B1(int b0, int b1):B0(b0), b1_(b1){} 
-        virtual void printB() {
-            cout << "B1::printB()" << endl;
-        }
-        virtual ~B1() {
-            cout << "调用了B1的析构函数" << endl;            
-        }
-        virtual void show() {
-            cout << "show" << endl;
-        }    
-};
+// class B1:public B0{
+//     private:
+//         int b1_;
+//     public:
+//         B1(int b0, int b1):B0(b0), b1_(b1){} 
+//         virtual void printB() {
+//             cout << "B1::printB()" << endl;
+//         }
+//         virtual ~B1() {
+//             cout << "调用了B1的析构函数" << endl;            
+//         }
+//         virtual void show() {
+//             cout << "show" << endl;
+//         }    
+// };
 
-    return Complex(a.real_ + real_, a.imag_ + imag_);
-}
 
 
 int main() {
@@ -266,9 +264,22 @@ int main() {
         // cout << real << endl;        
     #endif
 
+    // int a = 0x1234;
+    // char c = (char)(a);
+    // if(c == 0x12) {
+    //     cout << "大端" <<endl;
+    // } else if(c == 0x34) {
+    //     cout << "小端" << endl;
+    // }
 
-
-
+    // double m = 1;
+    // try {
+    //     if(m ==  1) 
+    //         throw -1;
+    // } catch (int error) {
+    //     cout << "catch error -1" << endl;
+    // }
+    // cout << "end" << endl;
     
 
 
