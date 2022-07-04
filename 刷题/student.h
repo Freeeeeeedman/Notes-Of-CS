@@ -5,6 +5,7 @@
 using namespace std;
 extern int a;
 const int b = 1;
+static int c = 1;
 class student {
     private:
         int id_;

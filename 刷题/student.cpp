@@ -6,6 +6,10 @@ int a;
 //     age_ = age;
 // }
 
+static void test() {
+    
+}
+
 int main() {
-    cout << b << endl;
+    int b = 1;
 }

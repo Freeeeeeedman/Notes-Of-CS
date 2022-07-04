@@ -13,7 +13,18 @@
             constructor属性可以指定函数在main函数执行之前进行调用，与之对应destructor可以指定某个函数在main函数执行结束之后再执行
      - objc_subclassing_restricted
             指明当前类型不能有子类，相当于final关键字
-
+3. 头文件中全局变量，extern，const，static
+   - extern 全局变量
+      A.h:extern int a;声明
+      A.cpp: int a = 1;定义
+      B.cpp: include "A.h"包含
+      否则直接在头文件定义a，在多处include该头文件，会导致重复定义而无法编译
+   - const 常量
+      定义在头文件中，在多处include该头文件，对于const全局变量，C++会默认认为其为内部连接，不会导致重复定义
+   - static 静态变量
+      定义在源文件.cpp中
+      如果定义在头文件.h中，不会出现重定义错误，因为在每个编译单元都对它开辟了额外的空间进行存储。每个值互相不影响。
+      
 
 #### C++标准库
 1. 万用头文件
