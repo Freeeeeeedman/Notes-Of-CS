@@ -281,8 +281,15 @@ int main() {
     // }
     // cout << "end" << endl;
     
-
-
+    int a = 1;
+    int b = 2;
+    auto func1 = [&](int c) {b = a + c;};
+    auto func2 = [a, b](int c) mutable->int {return b += a + c;};
+    // func1(2);
+    // cout << b << endl;
+    int e = func2(2);
+    cout << b << endl;
+    cout << e << endl;
 }
 
 

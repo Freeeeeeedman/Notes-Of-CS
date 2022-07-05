@@ -90,7 +90,24 @@
         for(const auto &a : v) {
             cout << a << ' ';
         }
-5. stack
+5. list
+   - 简介
+       #include <list>
+       双向链表
+       list<T> lt;
+       list<T> lt(n);
+       list<T> lt(n, val);
+   - 方法
+       begin()和end()
+       push_back() 和push_front()
+       empty()
+       resize()
+       clear()
+       front()和back()
+       pop_back和pop_front()
+       insert()
+       erase()
+6. stack
    - 简介
         #include<stack>
         栈，先进后出，后进先出
@@ -115,7 +132,7 @@
                 cout << a[--top];
             }
         ```
-6. queue
+7. queue
    - 简介
         #include<queue>
         队列，先进先出，后进后出
@@ -127,7 +144,7 @@
         pop()	删除第一个元素 出队 O(1)
         size()	返回队列中元素个数，返回值类型unsigned int O(1)
         empty()	判断是否为空，队列为空，返回true O(1)
-7. deque
+8. deque
    - 简介
           #include<deque>
           双端队列，首尾都可以插入和删除
@@ -145,7 +162,7 @@
           sort(d.begin(),d.end())
           //从大到小排序
           sort(q.begin(), q.end(), greater());
-8. priority_queue
+9.  priority_queue
    - 简介
           #include <queue>
           priority_queue<int> pq;
@@ -184,7 +201,7 @@
           priority_queue<int,vector<int>,cmp2>pq2;
           ```
      - **sort的排序规则和优先队列的排序规则是相反的**
-9.  map
+11. map
    - 简介
           #include <map>
           映射,键值对，key-value
