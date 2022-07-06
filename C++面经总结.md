@@ -1205,11 +1205,6 @@
    - 缺点：
         - 内部碎片：因为自由链表的管理问题，它会把我们需求的内存块自动提升为8的倍数，这时若你需要1个字节，它会给你8个字节，即浪费了7个字节
         - 占用内存空间：内存池申请的所有内存只有在进程结束才会释放内存，还给操作系统。导致其他进程无法使用内存
-8.  STL中的allocator、deallocator
-    - 主要用在二级配置器上，大于128bytes调用一级配置器，否则调用二级配置器，具体过程见上
-    - 空间配置函数allocate()
-    - 空间释放函数deallocate()
-9.  如何在共享内存上使用STL标准库？
 9. STL中的allocator、deallocator
     - 主要用在二级配置器上，大于128bytes调用一级配置器，否则调用二级配置器，具体过程见上
     - 空间配置函数allocate()
@@ -1383,6 +1378,7 @@
    - map的find函数：用关键码执行查找，找到了返回该位置的迭代器；如果不存在这个关键码，就返回尾迭代器
 
 9.  STL中unordered_map(hash_map)和map的区别
+5.  STL中unordered_map(hash_map)和map的区别
     - 性质不同
         unordered_map不会根据key的大小进行排序
     - 底层结构不同
@@ -1391,6 +1387,7 @@
         map的key需要定义operator<。而unordered_map需要定义hash_value函数并且重载operator==。
 
 10. hash_map如何解决冲突以及扩容
+6.  hash_map如何解决冲突以及扩容
     - hash_map底层使用的是hash_table，而hash_table使用的开链法进行冲突避免，所有hash_map采用开链法进行冲突解决。
     - 扩容(resize)就是重新计算容量，当HashMap对象内部的数组无法装载更多的元素时，对象就需要扩大数组的长度，以便能装入更多的元素
 #### 5.3 string
