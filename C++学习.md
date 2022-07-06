@@ -90,6 +90,20 @@
         for(const auto &a : v) {
             cout << a << ' ';
         }
+     - 通过迭代器删除元素会导致迭代器失效，那么如何通过迭代器删除特定元素？
+           ``` 
+            while( itor != vec.end() )
+            {
+                  if( *itor == 300 )
+                  {
+                        itor = vec.erase(itor);//重新获取迭代器，之前的itor指向状态不确定
+                  }
+                  else
+                  {
+                        itor++;
+                  }
+            }
+           ```
 5. list
    - 简介
        #include <list>
