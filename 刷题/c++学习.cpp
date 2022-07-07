@@ -170,6 +170,11 @@ class B0 {
 //         }    
 // };
 
+class A {
+    private: 
+        int a_;
+        
+}
 
 
 int main() {
