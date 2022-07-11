@@ -308,7 +308,7 @@ unordered_multiset ： 元素无序可以出现多次
 13. string
     - 简介
           #include <string>
-     字符串
+      字符串,其中每个字符为char类型
     - 定义
           string str1; //生成空字符串
           string str2("123456789"); //生成"1234456789"的复制品 
