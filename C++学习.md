@@ -35,7 +35,7 @@
         int arr[10] = {1, 2, 3, 4, 5};剩下的默认用0填充
         int arr[] = {1, 2, 3, 4, 5};
    - 注意
-     - 统计整个数组的长度：sizeof(arr) / sizeof(arr[0])
+     - **统计整个数组的长度**：sizeof(arr) / sizeof(arr[0])
      - 获取数组首地址：arr 或 &arr[0]
    - 二维数组
         int arr[2][3] = { {1,2,3}, {4,5,6} };
@@ -56,26 +56,26 @@
    - 定义
         vector<int>num;
         vector<int> v(n);//定义一个长度为n的数组，动态定义
-        vector<int> v(n，0);//所有的元素均为0
-        vector<int> a{1, 2, 3, 4, 5};
+        **vector<int> a{1, 2, 3, 4, 5};**
         vector<int> b(a);//拷贝初始化, 两个数组中的类型必须相同
         vector<int>num[5];//定义可变长二维数组
         //注意：行是不可变的（只有5行），而列可变可以在指定行添加元素
         //第一维固定长度为5，第二维长度可以改变
         vector<vectot<int>>num;//定义一个行和列均可变的二维数组
-        vector<vector<int>> a(n + 1, vector<int>(m + 1, 0));
+        **vector<vector<int>> a(n + 1, vector<int>(m + 1, 0));**
    - 方法
-        c.front()	返回第一个数据
-        c.pop_back()	删除最后一个数据 O(1)
-        c.push_back(element)	在尾部加一个数据 O(1)
-        c.size()	返回实际数据个数（unsigned类型） O(1)
+        **c.front()	返回第一个数据**
+        **c.pop_back()	删除最后一个数据 O(1)**
+        **c.push_back(element)	在尾部加一个数据 O(1)**
+        **c.size()	返回实际数据个数（unsigned类型） O(1)**
         c.clear()	清除元素个数 O(N),N为元素个数
         c.resize(n) 改变数组大小为n,如果没有默认赋值为0
         c.resize(n,v)	改变数组大小为n,n个空间数值赋为v，如果没有默认赋值为0
-        c.insert(it,x)	向任意迭代器it插入一个元素x O(N)
+        **c.insert(it,x)	向任意迭代器it之前插入一个元素x，并返回表示新插入元素位置的迭代器 O(N)**
         例：c.insert(c.begin()+2,-1)	将-1插入c[2]的位置
         c.erase(first,last)	删除[first,last)的所有元素
-        c.begin()	返回首元素的迭代器（通俗来说就是地址）
+        **c.erase(pos)删除 vector 容器中 pos 迭代器指定位置处的元素，并返回指向被删除元素下一个位置元素的迭代器。该容器的大小（size）会减 1**
+        **c.begin()	返回首元素的迭代器（通俗来说就是地址）**
         c.end()	返回最后一个元素后一个位置的迭代器（地址）
         c.empty()	判断是否为空，为空返回真，反之返回假
    - 访问
@@ -134,7 +134,7 @@
         size()	返回stack内元素的个数 O(1)
    - 访问
       - 栈只能对栈顶元素进行操作，如果想要进行遍历，只能将栈中元素一个个取出来存在数组中
-      - 可以通过一个数组对栈进行模拟，一个存放下标的变量top模拟指向栈顶的指针
+      - **可以通过一个数组对栈进行模拟，一个存放下标的变量top模拟指向栈顶的指针**
         ```
             vector<int> a(100);
             int top = 0;
@@ -187,7 +187,7 @@
           size()	队列元素个数
           empty()	是否为空
    - 设置优先级
-     - priority_queue<int, vector<int>, less<int> >pq;//最后两个>之间要有空格
+     - **priority_queue<int, vector<int>, less<int> >pq;//最后两个>之间要有空格**
      - 第二个参数
           vector< int > 是用来承载底层数据结构堆的容器，若优先队列中存放的是double型数据，就要填vector< double >
      - 第三个参数
@@ -219,68 +219,68 @@
    - 简介
           #include <map>
           映射,键值对，key-value
-          有序且不重复，map会按照键的顺序从小到大自动排序
+          **有序且不重复，map会按照键的顺序从小到大自动排序**
    - 定义
           map<string, string> mp;
           map<string, int> mp;
    - 方法
-          mp.find(key)	返回键为key的映射的迭代器 O(logN) 注意：用find函数来定位数据出现位置，它返回一个迭代器。当数据存在时，返回数据所在位置的迭代器，数据不存在时，返回mp.end()
-          mp.erase(it)	删除迭代器对应的键和值O(1)
-          mp.erase(key)	根据映射的键删除键和值 O(logN)
+          **mp.find(key)	返回键为key的映射的迭代器 O(logN) 注意：用find函数来定位数据出现位置，它返回一个迭代器。当数据存在时，返回数据所在位置的迭代器，数据不存在时，返回mp.end()**
+          **mp.erase(it)	删除迭代器对应的键和值O(1)**
+          **mp.erase(key)	根据映射的键删除键和值 O(logN)**
           mp.erase(first,last)	删除左闭右开区间迭代器对应的键和值 O(last-first)
           mp.size()	返回映射的对数 O(1)
           mp.clear()	清空map中的所有元素 O(N)
-          mp.insert()	插入元素，插入时要构造键值对
+          **mp.insert()	插入元素，插入时要构造键值对**
           mp.empty()	如果map为空，返回true，否则返回false
           mp.begin()	返回指向map第一个元素的迭代器（地址）
           mp.end()	返回指向map尾部的迭代器（最后一个元素的下一个地址）
-          mp.lower_bound()	返回一个迭代器，指向键 >= key的第一个元素
-          mp.upper_bound()	返回一个迭代器，指向键 > key的第一个元素
+          **mp.lower_bound()	返回一个迭代器，指向键 >= key的第一个元素**
+          **mp.upper_bound()	返回一个迭代器，指向键 > key的第一个元素**
    - 注意
      - 赋值方式
           mp["学习"] = "看书";
-          mp.insert(pair<string,string>("fruit","水果"));
-          mp.insert({"hahaha","wawawa"});
+          **mp.insert(pair<string,string>("fruit","水果"));**
+          **mp.insert({"hahaha","wawawa"});**
      - 访问
           下标访问：mp["菜哇菜"] = "强哇强";
           迭代器访问：map<string,string>::iterator it;
                     for(it = mp.begin(); it != mp.end(); it++) {
                          cout << it->first;
-                         cout << it->end;
+                         cout << it->second;
                     }
           智能指针访问：for(auto i : mp)
           指定元素访问:map<char,int>::iterator it = mp.find('a');
-                    cout << it -> first << " " <<  it->second << "\n";
+                    **cout << it -> first << " " <<  it->second << "\n";**
 11. mutimap, unordered_map
 12. set
     - 简介
           #include<set>
           set<int> se;
-          有序且不重复，由小到大排序
+          **有序且不重复，由小到大排序**
     - 方法
           s.begin()	返回set容器的第一个元素的地址（迭代器）
           s.end()	返回set容器的最后一个元素的地址（迭代器）
-          s.rbegin()	返回逆序迭代器，指向容器元素最后一个位置
-          s.rend()	返回逆序迭代器，指向容器第一个元素前面的位置
+          **s.rbegin()	返回逆序迭代器，指向容器元素最后一个位置**
+          **s.rend()	返回逆序迭代器，指向容器第一个元素前面的位置**
           s.clear()	删除set容器中的所有的元素,返回unsigned int类型O(N)
           s.empty()	判断set容器是否为空
           s.insert()	插入一个元素
           s.size()	返回当前set容器中的元素个数O(1)
-          erase(iterator)	删除定位器iterator指向的值
+          **erase(iterator)	删除定位器iterator指向的值**
           erase(first,second）	删除定位器first和second之间的值
-          erase(key_value)	删除键值key_value的值
+          **erase(key_value)	删除键值key_value的值**
           查找	
-          s.find(元素)	查找set中的某一元素，有则返回该元素对应的迭代器，无则返回结束迭代器
-          s.lower_bound(k)	返回大于等于k的第一个元素的迭代器
-          s.upper_bound(k)	返回大于k的第一个元素的迭代器
+          **s.find(元素)	查找set中的某一元素，有则返回该元素对应的迭代器，无则返回结束迭代器**
+          **s.lower_bound(k)	返回大于等于k的第一个元素的迭代器**
+          **s.upper_bound(k)	返回大于k的第一个元素的迭代器**
     - 访问
         - 迭代器访问
         - 智能指针访问
-        - 访问最后一个元素：
+        - **访问最后一个元素：**
           set<int>::iterator iter = s.end();
           iter--;
           cout<<(*iter)<<endl; 
-    - 重载<运算符
+    - **重载<运算符**
           ```
           struct cmp {
                bool operator () (const int& u, const int& v) const {
@@ -294,7 +294,7 @@ unordered_set ：元素无序且只能出现一次
 unordered_multiset ： 元素无序可以出现多次
 12. pair
     - 简介
-          #include <utility>
+          **#include <utility>**
           pair只含有两个元素，可以看作是只有两个元素的结构体。
     - 作用
           作为map键值对进行插入
@@ -319,30 +319,30 @@ unordered_multiset ： 元素无序可以出现多次
     - 特性
           支持比较运算符，从前往后逐一比较
           支持+运算符，代表拼接字符串
-    - string与C语言字符串（C-string）的区别
+    - **string与C语言字符串（C-string）的区别**
       - string是C++的一个类，专门实现字符串的相关操作。具有丰富的操作方法，数据类型为string，字符串结尾没有\0字符
       - C-string，C语言中的字符串，用char数组实现，类型为const char *,字符串结尾以\0结尾
       - string转char[]
           string s = "xing ma qi";
-          char s2[] = s.c_str();
+          **char s2[] = s.c_str();**
     - 方法
           s.size()  返回string对象的字符个数
-          s.push_back()	在末尾插入一个字符
-          s.insert(pos,element)在pos位置插入element, s.insert(0, ‘1’)
-          s.append(str)	在s字符串结尾添加str字符串
-          erase(iterator p)	删除字符串中p所指的字符
+          **s.push_back()	在末尾插入一个字符**
+          **iterator insert(iterator it, char c);//在it处插入字符c，返回插入后迭代器的位置**
+          **basic_string& insert (size_type pos, const basic_string& str);在原串下标为pos的字符前插入字符串str**
+          **erase(iterator p)	删除字符串中p所指的字符**
           erase(iterator first, iterator last)	删除字符串中迭代器区间[first,last)上所有字符
-          erase(pos, len)	删除字符串中从索引位置pos开始的len个字符
+          **erase(pos, len)	删除字符串中从索引位置pos开始的len个字符**
           clear()	删除字符串中所有字符, 实质是把字符串空间首字符设置为了“\0”
-          s.replace(pos,n,str)	把当前字符串从索引pos开始的n个字符替换为str
-          s.replace(it1,it2,str)	把当前字符串[it1,it2)区间替换为str
-          tolower(s[i])	转换为小写
-          toupper(s[i])	转换为大写
-          s.substr(pos,n)	截取从pos索引开始的n个字符
-          s.find (str, pos)	在当前字符串的pos索引位置(默认为0)开始，查找子串str，返回找到的位置索引，-1表示查找不到子串
-          s.find (c, pos)	在当前字符串的pos索引位置(默认为0)开始，查找字符c，返回找到的位置索引，-1表示查找不到字符
+          **s.replace(pos,n,str)	把当前字符串从索引pos开始的n个字符替换为str**
+          **s.replace(it1,it2,str)	把当前字符串[it1,it2)区间替换为str**
+          **tolower(s[i])	转换为小写**
+          **toupper(s[i])	转换为大写**
+          **s.substr(pos,n)	截取从pos索引开始的n个字符**
+          **s.find (str, pos)	在当前字符串的pos索引位置(默认为0)开始，查找子串str，返回找到的位置索引，-1表示查找不到子串**
+          **s.find (c, pos)	在当前字符串的pos索引位置(默认为0)开始，查找字符c，返回找到的位置索引，-1表示查找不到字符**
     - 排序：sort(s.begin(),s.end());  //按ASCII码排序
-14. bitset
+1.  bitset
     - 简介
           #include <bitset>
           类似数组，并且每一个元素只能是0或1，每个元素只用1bit空间
@@ -352,16 +352,16 @@ unordered_multiset ： 元素无序可以出现多次
           bitset<4> bitset1;　　  //无参构造，长度为４，默认每一位为0
           bitset<9> bitset2(12);　//长度为9，二进制保存，前面用0补充
           bitset<10> bitset3(string("100101));　　//长度为10，前面用0补充
-15. array
+2.  array
     - 简介
           #include <array>
           array是C++11新增的容器，效率与普通数据相差无几，比vector效率要高，自身添加了一些成员函数。
-          和其它容器不同，array 容器的大小是固定的，无法动态的扩展或收缩，只允许访问或者替换存储的元素。
+          和其它容器不同，array 容器的大小是固定的，无法动态的扩展或收缩，**只允许访问或者替换存储的元素**。
           array的使用要在std命名空间里
     - 声明
           array<int, 100> a;元素的值不确定
           array<int, 100> a{};元素的值为0
-          array<int, 100> a{1, 2, 3};
+          **array<int, 100> a{1, 2, 3};**
           array<int, 100> a({1, 2, 3});
           array<int, 100> a = {1, 2, 3};
           array<int, 100> a = {1, 2, 3};
@@ -388,7 +388,7 @@ unordered_multiset ： 元素无序可以出现多次
           array1.swap(array2)	交换 array1 和 array2 容器中的所有元素，但前提是它们具有相同的长度和类型
     - 排序
           sort(a.begin(), a.end());   
-16. tuple
+3.  tuple
     - 简介
           #include <tuple>
           tuple模板是pair的泛化，可以封装不同类型任意数量的对象。
@@ -402,7 +402,7 @@ unordered_multiset ： 元素无序可以出现多次
           int a, b, c, d;
           tie(a, b, c, d) = t1;
           cout << a << b << c << d;
-17. STL函数
+4.  **STL函数**
     beg为序列的初始地址，end为序列的尾地址
     - accumulate(beg,end,init)
         #include <numeric>
@@ -432,7 +432,7 @@ unordered_multiset ： 元素无序可以出现多次
           O(1)， 找多个元素的最大值和最小值
           mx = max(a,b);//找a，b的最大值和最小值
           mn = min(a,b);
-          mx = max({a,b,c,d});//找到a,b,c,d的最大值和最小值
+          **mx = max({a,b,c,d});//找到a,b,c,d的最大值和最小值**
           mn = min({a,b,c,d});
     - reverse(beg,end)
           #include <algorithm>
@@ -443,14 +443,14 @@ unordered_multiset ： 元素无序可以出现多次
           stable_sort()功能和sort()基本一样区别在于stable_sort()能够保证相等元素的相对位置，排序时不会改变相等元素的相对位置 
     - to_string()
           #include <string>
-          将数字转化为字符串,支持小数（double）
+          **将数字转化为字符串,支持小数（double）**
     - unique(beg,end)
           #include <algorithm>          
-          要求有序序列
-          消除重复元素，但不实际删除元素。返回消除完重复元素的部分的末尾的下一位的地址
+          **要求有序序列**
+          **消除重复元素，但不实际删除元素。返回消除完重复元素的部分的末尾的下一位的地址**
           vector<int> a = {1, 2, 3, 3, 4, 4, 5, 6, 7, 7, 9};
-          auto it = unique(a.begin(), a.end());it指向9后面的一位而不是9
-          a.erase(it, a.end());删除重复元素
+          **auto it = unique(a.begin(), a.end());it指向9后面的一位而不是9**
+          **a.erase(it, a.end());删除重复元素**
 
 #### C++11 新特性
 1. final 关键字
