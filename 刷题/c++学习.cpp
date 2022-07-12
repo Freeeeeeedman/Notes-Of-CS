@@ -300,7 +300,7 @@ int main() {
         // cout << e << endl;               
     #endif
 
-    vector<int> vec{2, 5, 6, 9, 0, 1 ,7};
+    // vector<int> vec{2, 5, 6, 9, 0, 1 ,7};
     // sort(vec.begin(), vec.end(), compare());
     // for(auto &i : vec) {
     //     cout << i << endl;
@@ -309,9 +309,14 @@ int main() {
     // for(auto &i : st) {
     //     cout << i << endl;
     // }
-    priority_queue<int, vector<int>, compare> pq (vec.begin(), vec.end());
-    cout << pq.top() << endl;
+    // priority_queue<int, vector<int>, compare> pq (vec.begin(), vec.end());
+    // cout << pq.top() << endl;
 
+    bitset<32> bt1(string("011111"));
+    bitset<32> bt2(12);
+    bt1[0] = 0;
+    cout << bt1[0] << endl;
+    cout << bt1 << endl;
 }
 
 

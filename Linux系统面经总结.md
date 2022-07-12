@@ -5,14 +5,12 @@
     shutdown
 2. 系统目录结构
     /bin    系统的一些指令
-    /boot   启动Linux时使用的一些核心文件
     /dev    Linux的外部设备
     /etc    系统管理所需要的配置文件
     /home   用户的主目录
     /lib    动态连接共享库
     /media  自动识别的设备的挂载处
     /opt    额外安装软件所摆放的目录
-    /proc   虚拟的目录，是系统内存的映射
     /root   超级权限者的用户主目录
     /var    各种日志文件
     /usr    用户的很多应用程序和文件都放在这个目录
@@ -97,14 +95,14 @@
 
 #### 2. linux面试问题
 1. 说一说常用的命令
-
-    一般命令：ls，pwd，cd,ln， touch,cp,mv,rm,tar,find， su,chmod，ldd
-    数据处理命令：cat，vim，grep,awk(用于正则匹配来筛选数据，用过一点，后来不用了，用python来做数据处理更方便)
-    性能分析命令：
-    网络：ifconfig， ip看网络配置，netstat和sar分析网络吞吐量， tcmdump抓包给wireshark分析，还要就是traceroute
-    CPU/内存：dmidecode看硬件信息，top/htop/ps看进程占用，vmstat看CPU/内存/IO的分析，还有strace分析进程的调用情况，还有就是free和pmap看内存信息
-    IO： fdisk -l 和 df 查看磁盘基本信息，iostat可以看IO的吞吐量和效率，iotop的话可以定位哪个进程IO开销大
-    
+    - 一般命令：ls，pwd，cd,ln， touch,cp,mv,rm,tar,find， su,chmod，ldd
+    - 数据处理命令：cat，vim，grep,awk(用于正则匹配来筛选数据，用过一点，后来不用了，用python来做数据处理更方便)
+    - 性能分析命令：
+      - 网络：ifconfig看网络配置，netstat查看socket信息，sar历史数据统计工具（网络IO内存）， tcmdump抓包给wireshark分析，traceroute排查网络问题
+      - CPU/内存：dmidecode看硬件信息，top/htop/ps看进程CPU占用，vmstat（虚拟内存统计CPU内存IO），还有strace分析进程的系统调用情况，pmap进程的内存映像信息
+      - IO： fdisk -l和df查看磁盘基本信息，iostat可以看IO的吞吐量和效率，iotop的话可以定位哪个进程IO开销大
+      - 一些通用性能指标： CPU:us sy id hi si cs r, IO:b wa, 内存：swap available buff, 网络：TTL, PPS, MTU
+      - 内存不足的表现：free  memory急剧减少，回收buffer和cacher也无济于事，大量使用交换分区（swpd）,页面交换（swap）频繁，读写磁盘数量（io）增多，缺页中断（in）增多，上下文切换（cs）次数增多，等待IO的进程数（b）增多，大量CPU时间用于等待IO（wa）   
 2. 说一说linux目录结构
     /bin    系统的一些指令
     /boot   启动Linux时使用的一些核心文件
@@ -119,7 +117,6 @@
     /usr/sbin   超级用户使用的比较高级的管理程序和系统守护程序
     /usr/src    内核源代码默认的放置目录
 3. 如何查看Linux端口占用
-    lsof -i 端口号
     netstat 结合grep
 4. kill -15 和 kill -9 的区别
     kill -9 ：SIGKILL 是强制杀死一个进程,不可以被忽略，不是正常关闭
@@ -302,7 +299,6 @@
     - io：显示了多少块从块设备读取（bi）和写出（bo）,通常反映了硬盘I/O。
     - system：显示每秒中断(in)和上下文切换（cs）的数量。
     - cpu：显示所有的cpu时间花费在各类操作的百分比，包括执行用户代码（非内核），执行系统代码（内核），空闲以及等待IO。
-    
     内存不足的表现：free  memory急剧减少，回收buffer和cacher也无济于事，大量使用交换分区（swpd）,页面交换（swap）频繁，读写磁盘数量（io）增多，缺页中断（in）增多，上下文切换（cs）次数增多，等待IO的进程数（b）增多，大量CPU时间用于等待IO（wa）
 6. dstat
     系统监控，pu使用情况，磁盘io情况，网络发包情况和换页

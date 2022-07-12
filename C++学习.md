@@ -293,7 +293,7 @@
 13. multiset:元素可以重复，且元素有序
 unordered_set ：元素无序且只能出现一次
 unordered_multiset ： 元素无序可以出现多次
-12. pair
+14. pair
     - 简介
           **#include <utility>**
           pair只含有两个元素，可以看作是只有两个元素的结构体。
@@ -306,7 +306,7 @@ unordered_multiset ： 元素无序可以出现多次
     - 访问
           pair<int,int>p[20];
           cout << p[i].first << " " << p[i].second;    
-13. string
+15. string
     - 简介
           #include <string>
       字符串,其中每个字符为char类型
@@ -343,17 +343,46 @@ unordered_multiset ： 元素无序可以出现多次
           **s.find (str, pos)	在当前字符串的pos索引位置(默认为0)开始，查找子串str，返回找到的位置索引，-1表示查找不到子串**
           **s.find (c, pos)	在当前字符串的pos索引位置(默认为0)开始，查找字符c，返回找到的位置索引，-1表示查找不到字符**
     - 排序：sort(s.begin(),s.end());  //按ASCII码排序
-1.  bitset
+16. bitset
     - 简介
           #include <bitset>
           类似数组，并且每一个元素只能是0或1，每个元素只用1bit空间
     - 声明
-          bitset < n >a;	a有n位，每位都为0     
-          bitset < n >a(s);	a是string对象s中含有的位串的副本
-          bitset<4> bitset1;　　  //无参构造，长度为４，默认每一位为0
-          bitset<9> bitset2(12);　//长度为9，二进制保存，前面用0补充
-          bitset<10> bitset3(string("100101));　　//长度为10，前面用0补充
-2.  array
+            bitset <n>a;	a有n位，每位都为0     
+            string s = "100101";
+            bitset<10>a3(s);//长度为10，前面用0补充
+            bitset<9> bitset2(12);　//长度为9，二进制保存，前面用0补充
+            bitset<10> bitset3(string("100101));　　//长度为10，前面用0补充
+    - 运算
+      cout << (foo^=bar) << endl;       // 1010 (foo对bar按位异或后赋值给foo)
+      cout << (foo&=bar) << endl;       // 0010 (按位与后赋值给foo)
+      cout << (foo|=bar) << endl;       // 0011 (按位或后赋值给foo)
+      cout << (foo<<=2) << endl;        // 1100 (左移２位，低位补０，有自身赋值)
+      cout << (foo>>=1) << endl;        // 0110 (右移１位，高位补０，有自身赋值)
+      cout << (~bar) << endl;           // 1100 (按位取反) 
+      cout << (bar>>1) << endl;         // 0001 (右移，不赋值)
+      cout << (foo==bar) << endl;       // （0）false (0110==0011为false)
+      cout << (foo!=bar) << endl;       // （1）true  (0110!=0011为true)
+      cout << (foo&bar) << endl;        // 0010 (按位与，不赋值)
+      cout << (foo|bar) << endl;        // 0111 (按位或，不赋值)
+      cout << (foo^bar) << endl;		  // 0101 (按位异或，不赋值)
+    - 单一元素访问和修改
+      bitset<4>a1(string("1011"));
+      cout<< a1[0] << endl; //1, **对应的是低地址,下标是反的**
+      a1[0] = 0;
+    - 各种函数
+      cout<<foo.count()<<endl;//5　count函数用来求bitset中1的位数
+      cout<<foo.size()<<endl;//8　size函数用来求bitset的大小
+      cout<<foo.test(0)<< endl;//true　　（test函数用来查下标处的元素是０还是１，并返回false或true，此处foo[0]为１，返回true
+      cout<<foo.test(2)<<endl;//false　　同理，foo[2]为０，返回false
+      cout<<foo.any()<<endl;//true　　any函数检查bitset中是否有１
+      cout<<foo.none()<<endl;//false　　none函数检查bitset中是否没有１
+      cout<<foo.all()<<endl;//false　　all函数检查bitset中是全部为１
+
+
+
+
+1.  array
     - 简介
           #include <array>
           array是C++11新增的容器，效率与普通数据相差无几，比vector效率要高，自身添加了一些成员函数。
@@ -389,7 +418,7 @@ unordered_multiset ： 元素无序可以出现多次
           array1.swap(array2)	交换 array1 和 array2 容器中的所有元素，但前提是它们具有相同的长度和类型
     - 排序
           sort(a.begin(), a.end());   
-3.  tuple
+2.  tuple
     - 简介
           #include <tuple>
           tuple模板是pair的泛化，可以封装不同类型任意数量的对象。
@@ -403,7 +432,7 @@ unordered_multiset ： 元素无序可以出现多次
           int a, b, c, d;
           tie(a, b, c, d) = t1;
           cout << a << b << c << d;
-4.  **STL函数**
+3.  **STL函数**
     beg为序列的初始地址，end为序列的尾地址
     - accumulate(beg,end,init)
         #include <numeric>
