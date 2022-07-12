@@ -3,6 +3,7 @@
 */
 
 #include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
 
 // ÷«ƒ‹÷∏’Î
@@ -39,7 +40,7 @@ class auto_ptr {
                 _ptr = ap._ptr;
                 ap._ptr = nullptr;
             }
-            return this*;
+            return *this;
         } 
 
         //÷ÿ‘ÿ
@@ -102,3 +103,60 @@ class shared_ptr {
             return this;
         }
 };
+
+
+
+
+
+
+
+
+
+//√∞≈›≈≈–Ú
+void bubbleSort(vector<int> &vec) {
+    int n = vec.size() - 1;
+    bool order = false;
+    for(int i = 0; i <= n && !order; ++i) {
+        order = true;
+        for(int j = 0; j < n - i; ++j) {
+            if(vec[j] > vec[j + 1]) {
+                order = false;
+                swap(vec[j], vec[j + 1]);
+            }
+        }
+    }
+}
+
+void selectionSort(vector<int> &vec) {
+    int n = vec.size() - 1;
+    int min;
+    for(int i = 0; i < n; ++i) {
+        min = i;
+        for(int j = i + 1; j <= n; ++j) {
+            if(vec[min] > vec[j]) {
+                min = j;
+            }
+        }
+        swap(vec[min], vec[i]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+int main() {
+    vector<int> vec{0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
+    // bubbleSort(vec);
+    selectionSort(vec);
+    for(auto &i : vec) {
+        cout << i << ' ';
+    }
+    int a = 1;
+
+}
