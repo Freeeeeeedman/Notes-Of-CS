@@ -170,11 +170,15 @@ class B0 {
 //         }    
 // };
 
-class A {
-    private: 
-        int a_;
-        
+bool cmp(int &a, int &b) {
+    return a > b;
 }
+
+struct compare {
+    bool operator()(const int &a, const int &b) const{
+        return a > b;
+    } 
+};
 
 
 int main() {
@@ -266,35 +270,48 @@ int main() {
         // Complex c2(2, 3);
         // Complex c3 = c1 + c2;
         // double real = c3.getReal();
-        // cout << real << endl;        
+        // cout << real << endl; 
+
+        // int a = 0x1234;
+        // char c = (char)(a);
+        // if(c == 0x12) {
+        //     cout << "大端" <<endl;
+        // } else if(c == 0x34) {
+        //     cout << "小端" << endl;
+        // }
+
+        // double m = 1;
+        // try {
+        //     if(m ==  1) 
+        //         throw -1;
+        // } catch (int error) {
+        //     cout << "catch error -1" << endl;
+        // }
+        // cout << "end" << endl;
+        
+        // int a = 1;
+        // int b = 2;
+        // auto func1 = [&](int c) {b = a + c;};
+        // auto func2 = [a, b](int c) mutable->int {return b += a + c;};
+        // // func1(2);
+        // // cout << b << endl;
+        // int e = func2(2);
+        // cout << b << endl;
+        // cout << e << endl;               
     #endif
 
-    // int a = 0x1234;
-    // char c = (char)(a);
-    // if(c == 0x12) {
-    //     cout << "大端" <<endl;
-    // } else if(c == 0x34) {
-    //     cout << "小端" << endl;
+    vector<int> vec{2, 5, 6, 9, 0, 1 ,7};
+    // sort(vec.begin(), vec.end(), compare());
+    // for(auto &i : vec) {
+    //     cout << i << endl;
     // }
+    // set<int, compare> st{5, 4, 3, 1, 7, 2};
+    // for(auto &i : st) {
+    //     cout << i << endl;
+    // }
+    priority_queue<int, vector<int>, compare> pq (vec.begin(), vec.end());
+    cout << pq.top() << endl;
 
-    // double m = 1;
-    // try {
-    //     if(m ==  1) 
-    //         throw -1;
-    // } catch (int error) {
-    //     cout << "catch error -1" << endl;
-    // }
-    // cout << "end" << endl;
-    
-    int a = 1;
-    int b = 2;
-    auto func1 = [&](int c) {b = a + c;};
-    auto func2 = [a, b](int c) mutable->int {return b += a + c;};
-    // func1(2);
-    // cout << b << endl;
-    int e = func2(2);
-    cout << b << endl;
-    cout << e << endl;
 }
 
 

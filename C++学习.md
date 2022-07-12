@@ -56,7 +56,8 @@
    - 定义
         vector<int>num;
         vector<int> v(n);//定义一个长度为n的数组，动态定义
-        **vector<int> a{1, 2, 3, 4, 5};**
+        **vector<int> v(n, 0);**
+        vector<int> a{1, 2, 3, 4, 5};
         vector<int> b(a);//拷贝初始化, 两个数组中的类型必须相同
         vector<int>num[5];//定义可变长二维数组
         //注意：行是不可变的（只有5行），而列可变可以在指定行添加元素
@@ -90,7 +91,7 @@
         for(const auto &a : v) {
             cout << a << ' ';
         }
-     - 通过迭代器删除元素会导致迭代器失效，那么如何通过迭代器删除特定元素？
+     - **通过迭代器删除元素会导致迭代器失效，那么如何通过迭代器删除特定元素？**
            ``` 
             while( itor != vec.end() )
             {
@@ -332,7 +333,7 @@ unordered_multiset ： 元素无序可以出现多次
           **basic_string& insert (size_type pos, const basic_string& str);在原串下标为pos的字符前插入字符串str**
           **erase(iterator p)	删除字符串中p所指的字符**
           erase(iterator first, iterator last)	删除字符串中迭代器区间[first,last)上所有字符
-          **erase(pos, len)	删除字符串中从索引位置pos开始的len个字符**
+          **erase(pos, n)	删除字符串中从索引位置pos开始的n个字符**
           clear()	删除字符串中所有字符, 实质是把字符串空间首字符设置为了“\0”
           **s.replace(pos,n,str)	把当前字符串从索引pos开始的n个字符替换为str**
           **s.replace(it1,it2,str)	把当前字符串[it1,it2)区间替换为str**
