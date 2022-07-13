@@ -312,11 +312,20 @@ int main() {
     // priority_queue<int, vector<int>, compare> pq (vec.begin(), vec.end());
     // cout << pq.top() << endl;
 
-    bitset<32> bt1(string("011111"));
-    bitset<32> bt2(12);
-    bt1[0] = 0;
-    cout << bt1[0] << endl;
-    cout << bt1 << endl;
+    // bitset<32> bt1(string("011111"));
+    // bitset<32> bt2(12);
+    // bt1[0] = 0;
+    // cout << bt1[0] << endl;
+    // cout << bt1 << endl;
+
+    // string str;
+    // str.push_back(' ');
+    // cout << int(str.empty()) << endl;
+    // string str = "123";
+    // char chs[4] = "123";
+    // string str2 = "1";
+    // char ch = '1';
+    // cout << int(str2[0] == ch) << endl;
 }
 
 

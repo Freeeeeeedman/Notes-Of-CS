@@ -142,9 +142,29 @@ void selectionSort(vector<int> &vec) {
 }
 
 
+//≤Â»Î≈≈–Ú
+void insertSort(vector<int> &vec) {
+    int n = vec.size() - 1;
+    for(int i = 1; i <= n; i++) {
+        int temp = vec[i];
+        for(int j = i; j >= 1 && temp < vec[j - 1]; --j) {
+            vec[j] = vec[j - 1];
+            vec[j - 1] = temp;
+        }
+    }
+}
 
-
-
+//œ£∂˚≈≈–Ú
+void shellSort(vector<int> &vec) {
+    int n = vec.size() - 1;
+    for(int gap = n / 2; gap > 0; gap /= 2) {
+        for(int i = gap; i <= n; i++) {
+            for(int j = i; j >= gap &&  vec[j] < vec[j - gap]; j-=gap) {
+                swap(vec[j - gap], vec[j]);
+            }
+        }
+    }
+}
 
 
 
@@ -153,7 +173,9 @@ void selectionSort(vector<int> &vec) {
 int main() {
     vector<int> vec{0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
     // bubbleSort(vec);
-    selectionSort(vec);
+    // selectionSort(vec);
+    // insertSort(vec);
+    shellSort(vec);
     for(auto &i : vec) {
         cout << i << ' ';
     }
