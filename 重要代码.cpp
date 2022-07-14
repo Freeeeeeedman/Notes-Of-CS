@@ -167,18 +167,75 @@ void shellSort(vector<int> &vec) {
 }
 
 
+//归并排序
+void merge(int *arr, int n) {
+    int temp[n];//n为数组长度
+    int i = 0;
+    int mid = n / 2;
+    int left = 0, right = mid;
+    while(left < mid && right < n) {
+        if(arr[left] < arr[right]) {
+            temp[i++] = arr[left++];
+        }else {
+            temp[i++] = arr[right++];
+        }
+    }
+    while(left < mid) {
+        temp[i++] = arr[left++];
+    }
+    while(right < n) {
+        temp[i++] = arr[right++];
+    }
+    for(int i = 0; i < n; i++) {
+        arr[i] = temp[i];
+    }
+}
+
+void mergeSort(int *arr, int n) {
+    if(n <= 1) return;
+    else {
+        mergeSort(arr, n / 2);//分
+        mergeSort(arr + n / 2, n - n / 2);
+        merge(arr, n);//治
+    }
+    
+}
+
+//快速排序
+void quickSort(vector<int> &vec, int left, int right) {
+    if(left >= right) return;
+    int first = left;
+    int last = right;
+    int key = vec[first];
+    while(first < last) {
+        while(first < last && vec[last] >= key) last--;
+        if(first < last) vec[first++] = vec[last];
+        while(first < last && vec[first] <= key) first++;
+        if(first < last) vec[last--] = vec[first];
+    }
+    vec[first] = key;
+    quickSort(vec, left, first - 1);
+    quickSort(vec, first + 1, right);
+}
+
 
 
 
 int main() {
     vector<int> vec{0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
+    int arr[] = {0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
+    int n = 10;
     // bubbleSort(vec);
     // selectionSort(vec);
     // insertSort(vec);
-    shellSort(vec);
+    // shellSort(vec);
+    // mergeSort(arr, n);
+    quickSort(vec, 0, vec.size() - 1);
     for(auto &i : vec) {
         cout << i << ' ';
     }
-    int a = 1;
+    // for(int i = 0; i < 10; i++) {
+    //     cout << arr[i] << ' ';
+    // }
 
 }
