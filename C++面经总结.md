@@ -258,7 +258,7 @@
     - final：当不希望某个类被继承，或不希望某个虚函数被重写，可以在类名和虚函数后添加final关键字，添加final关键字后被继承或重写，编译器会报错
         void foo() override; class B final : A{};
 9.  volatile关键字的用法
-    volatile定义变量的值是易变的，表明编译器不去优化该变量，每次操作该变量时一定要从内存中真正取出，而不是使用已经存在寄存器中的值。这样在多线程中使用被几个任务共享的变量就不会造成冲突。
+    volatile定义变量的值是易变的，表明编译器不去优化该变量.编译器对于没有更改过的变量会存储在高速缓存即寄存器中。加了volatile关键字后每次操作该变量时一定要从内存中真正取出，而不是使用已经存在寄存器中的值。这样在多线程中使用被几个任务共享的变量就不会造成冲突。
     const char* cpch;volatile char* vpch;
     char* const pchc;char* volatile pchv;
 10. mutable关键字的用法
