@@ -218,24 +218,52 @@ void quickSort(vector<int> &vec, int left, int right) {
     quickSort(vec, first + 1, right);
 }
 
+//堆排序
+void heapify(int *arr, int start, int end) {
+    int father = start;
+    int son = father * 2 + 1;
+    while(son <= end) {
+        if(son + 1<= end && arr[son] < arr[son + 1]) {
+            son++;
+        }
+        if(arr[father] > arr[son]) return; //如果父节点值大于子节点值，因为是由底到顶构造的，
+        else {                             //那么父节点就大于所有子节点
+            swap(arr[father], arr[son]);//否则需要再循环查找子树
+            father = son;
+            son = father * 2 + 1;
+        }
+    }
+}
 
+void heapSort(int *arr, int n) {
+    for(int i = n / 2 - 1; i >= 0; i--) { //由底到顶初始化子树
+        heapify(arr, i, n - 1);
+    }
+    for(int i = n - 1; i > 0; i--) {//由顶到底取最大值
+        swap(arr[0], arr[i]);
+        heapify(arr, 0, i - 1);
+    }
+}
+
+//计数排序
 
 
 int main() {
     vector<int> vec{0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
     int arr[] = {0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
-    int n = 10;
+    int n = sizeof(arr) / sizeof(arr[0]);
     // bubbleSort(vec);
     // selectionSort(vec);
     // insertSort(vec);
     // shellSort(vec);
     // mergeSort(arr, n);
-    quickSort(vec, 0, vec.size() - 1);
-    for(auto &i : vec) {
-        cout << i << ' ';
-    }
-    // for(int i = 0; i < 10; i++) {
-    //     cout << arr[i] << ' ';
+    // quickSort(vec, 0, vec.size() - 1);
+    heapSort(arr, n);
+    // for(auto &i : vec) {
+    //     cout << i << ' ';
     // }
+    for(int i = 0; i < 10; i++) {
+        cout << arr[i] << ' ';
+    }
 
 }
