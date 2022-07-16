@@ -246,6 +246,94 @@ void heapSort(int *arr, int n) {
 }
 
 //计数排序
+void countSort(vector<int> &vec) {
+    int n = vec.size();
+    if(n == 0) return;
+    int mx = vec[0], mn = vec[0];
+    vector<int> tmp(vec);
+    for(int i = 0; i < n; ++i) {
+        mx = max(mx, tmp[i]);
+        mn = min(mn, tmp[i]);
+    }
+    int k = mx - mn + 1;
+    int count[k]  = {0};
+    for(int i = 0; i < n; ++i) {
+        ++count[tmp[i] - mn];
+    }
+    for(int i = 1; i < k; ++i) {
+        count[i] += count[i - 1];
+    }
+    for(int i = n - 1; i >= 0; --i) {
+        vec[count[tmp[i] - mn]--] = tmp[i];//从后往前填数字
+                                        //--count或者count--都可以都是先减再取值
+                                            //因为count记录的是比自己小包括自己的数字的数目  
+    }
+
+}
+
+//桶排序
+void bucketSort(vector<int> &vec) {
+   int n = vec.size();
+   if(n == 0) return;
+   int mx = vec[0], mn = vec[0];
+   for(int i = 0; i < n; i++) {
+        mx = max(mx, vec[i]);
+        mn = min(mn, vec[i]);
+   } 
+   int k = mx - mn + 1;
+   vector<int> buckets(k, 0);
+   for(int i = 0; i < n; i++) {
+        ++buckets[vec[i] - mn];
+   }
+   int num = 0;
+   for(int i = 0; i < k; i++) {
+        for(int j = 0; j < buckets[i]; j++) {
+            vec[num++] = i + mn;
+        }
+   }
+}
+
+//基数排序
+void radixSort(vector<int> &vec) {
+    int n = vec.size();
+    int mx = vec[0];
+    for(int i = 0; i < n; i++) {
+        mx = max(mx, vec[i]);
+    }
+    int bit = 0;
+    while(mx) {
+        mx /= 10;
+        ++bit;
+    }
+    int div = 1;
+    for(int i = 0; i < bit; i++) {
+        int count[10] = {0};
+        vector<int> tmp(n, 0);
+        for(int i = 0; i < n; i++) {
+            ++count[vec[i] / div % 10];
+        }
+        for(int i = 0; i < 10; i++) {
+            count[i] += count[i - 1];
+        }
+        for(int i = n - 1; i >= 0; i--) {
+            tmp[--count[vec[i] / div % 10 - 0]] = vec[i];//这里相当于数组内最小值为0，所以不能排序负数值
+                                                        //如果要排序，则需要对数组整体加上一个偏移量，使得数组都为f非负整数，
+                                                       //排序完成后再整体减去这个偏移量
+        }
+        div *= 10;
+        vec = tmp;
+    }
+
+}
+
+
+
+
+
+
+
+
+
 
 
 int main() {
@@ -258,12 +346,17 @@ int main() {
     // shellSort(vec);
     // mergeSort(arr, n);
     // quickSort(vec, 0, vec.size() - 1);
-    heapSort(arr, n);
-    // for(auto &i : vec) {
-    //     cout << i << ' ';
-    // }
-    for(int i = 0; i < 10; i++) {
-        cout << arr[i] << ' ';
+    // heapSort(arr, n);
+    // countSort(vec);
+    // bucketSort(vec);
+    radixSort(vec);
+    for(auto &i : vec) {
+        cout << i << ' ';
     }
+    // for(int i = 0; i < 10; i++) {
+    //     cout << arr[i] << ' ';
+    // }
+
+
 
 }
