@@ -226,6 +226,7 @@
           map<string, int> mp;
    - 方法
           **mp.find(key)	返回键为key的映射的迭代器 O(logN) 注意：用find函数来定位数据出现位置，它返回一个迭代器。当数据存在时，返回数据所在位置的迭代器，数据不存在时，返回mp.end()**
+          **mp.count(kry)返回的是被查找元素的个数。如果有，返回1；否则，返回0。注意，map中不存在相同元素，所以返回值只能是1或0。**
           **mp.erase(it)	删除迭代器对应的键和值O(1)**
           **mp.erase(key)	根据映射的键删除键和值 O(logN)**
           mp.erase(first,last)	删除左闭右开区间迭代器对应的键和值 O(last-first)

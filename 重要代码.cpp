@@ -329,6 +329,142 @@ void radixSort(vector<int> &vec) {
 
 
 
+//n进制转10进制
+int ntoi(string &str, int radix) {
+    int ans = 0;
+    for(int i = 0; i < str.size(); ++i) {
+        char ch = str[i];
+        if(ch >= '0' && ch <= '9') {
+            ans = ans * radix + ch - '0'; 
+        }else {
+            ans = ans * radix + ch - 'a' + 10;
+        }
+    }
+    return ans;
+}
+
+//10进制转n进制
+string iton(int n, int radix) {
+    string ans;
+    do {
+        int t = n % radix;
+        if(t >= 0 && t <= 9) {
+            ans += t + '0';
+        }else {
+            ans += t - 10 + 'a';
+        }
+        n /= radix;
+    }while(n != 0);//一开始n==0的情况也要计算,还有要记得加';'
+    reverse(ans.begin(), ans.end());
+    return ans;
+}
+
+
+
+
+
+//LRU算法
+
+struct DLinkedNode {
+    int key, value;
+    DLinkedNode *prev;
+    DLinkedNode *next;
+    DLinkedNode():key(0), value(0), prev(nullptr), next(nullptr){}
+    DLinkedNode(int _key, int _value):key(_key), value(_value), prev(nullptr), next(nullptr){}
+};
+
+class LRUCache {
+    private:
+        int size;
+        int capacity;
+        unordered_map<int, DLinkedNode*> cache;//这里的key就是节点中的key值，但value为指向节点的指针
+        DLinkedNode *head;
+        DLinkedNode *tail;
+    
+    public:
+        LRUCache(int _capacity):capacity(_capacity), size(0){
+            head = new DLinkedNode();
+            tail = new DLinkedNode();
+            head->next = tail;
+            tail->prev = head;
+        }
+
+        int get(int key) {
+            if(!cache.count(key)) {
+                return -1;
+            }
+            DLinkedNode *node = cache[key];
+            moveToHead(node);//获取后移动到前端
+            return node->value;
+        }
+
+        void put(int key, int value) {
+            if(!cache.count(key)) {
+                DLinkedNode *node = new DLinkedNode(key, value);
+                cache[key] = node;
+                node->prev = head;
+                head->next->prev = node;
+                node->next = head->next;
+                head->next = node;//在前端添加新的节点
+                ++size;               
+                if(size > capacity) {
+                    DLinkedNode *tmp = removeTail();
+                    cache.erase(tmp->key); //在给链表添加或删除以及修改value时也要对cache做修改
+                    delete tmp;
+                    --size;
+
+                }            
+            }else {
+                DLinkedNode *node = cache[key];
+                node->value = value;
+                moveToHead(node);//修改后移动到前端
+            }
+
+        }
+
+        void moveToHead(DLinkedNode *node) {
+            node->prev->next = node->next;
+            node->next->prev = node->prev;
+            
+            node->prev = head;
+            head->next->prev = node;
+            node->next = head->next;
+            head->next = node;
+        }
+
+        DLinkedNode *removeTail() {
+            DLinkedNode *node = tail->prev;
+            node->prev->next = node->next;
+            node->next->prev = node->prev;
+            return node;            
+        }
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -337,9 +473,9 @@ void radixSort(vector<int> &vec) {
 
 
 int main() {
-    vector<int> vec{0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
-    int arr[] = {0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
-    int n = sizeof(arr) / sizeof(arr[0]);
+    // vector<int> vec{0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
+    // int arr[] = {0, 2, 5, 6, 1, 7, 9, 4, 3, 8};
+    // int n = sizeof(arr) / sizeof(arr[0]);
     // bubbleSort(vec);
     // selectionSort(vec);
     // insertSort(vec);
@@ -349,14 +485,24 @@ int main() {
     // heapSort(arr, n);
     // countSort(vec);
     // bucketSort(vec);
-    radixSort(vec);
-    for(auto &i : vec) {
-        cout << i << ' ';
-    }
+    // radixSort(vec);
+    // for(auto &i : vec) {
+    //     cout << i << ' ';
+    // }
     // for(int i = 0; i < 10; i++) {
     //     cout << arr[i] << ' ';
     // }
 
+    // string radix2 = "11001";
+    // string radix8 = "0144";    //0开头8进制
+    // string radix16 = "0x541";  //0x开头10进制
+    // string tmp = radix8.substr(1, radix16.size() - 1);    
+    // // string tmp = radix16.substr(2, radix16.size() - 2);
+    // int i = ntoi(tmp, 8);
+
+    // int n = 1345;
+    // cout << iton(n, 2) << endl;
+    // cout << "0x" + iton(n, 16) << endl;
 
 
 }
