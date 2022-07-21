@@ -442,12 +442,92 @@ class LRUCache {
 };
 
 
+/* 
+   三种经典的同步问题
 
+   1. 生产者与消费者问题
+        ```
+        sem mutex = 1;
+        sem fullBuffer = n;
+        sem emptyBuffer = 0;
 
+        void producer() {
+            while(1) {
+                P(emptyBuffer);
+                P(mutex);
+                缓冲区加入数据
+                V(mutex);
+                V(fullBuffer);
+            }
+        }
 
+        void consumer() {
+            while(1) {
+                P(fullBuffer);
+                P(mutex);
+                缓冲区读取数据
+                V(mutex);
+                V(emptyBuffer);
+            }
+        }
+        ```
 
+    2. 哲学家就餐问题
+        ```
+        sem fork[5] = {1};
+        void person(int i) {
+            while(1) {
+                think();
+                if(i % 2 == 0) {
+                    P(fork[i]);
+                    P(fork[(i + 1) % 5]);
+                }else {
+                    P(fork[(i + 1) % 5]);
+                    P(fork[i]);
+                }
+            }
+            V(fork[i]);
+            V(fork[(i + 1) % 5]);
+        }
+        ```
+    
+    3. 读者与写者模型
+        ```
+        int rCount = 0;
+        sem rCountMutex = 1;
+        sem wDataMutex = 1;
+        sem flag = 1;
 
+        void writer() {
+            P(flag);
+            P(wDataMutex);
+            write();
+            V(wDaraMutex);
+            V(flag);
+        }
 
+        void producer() {
+            P(flag);
+            P(rCountMutex);
+            if(rCount == 0) {
+                P(wDataMutex);
+            }
+            rCount++;
+            V(rCountMutex);
+            V(flag);
+            
+            read();
+
+            P(rCountMutex);
+            rCount--;
+            if(rCount == 0) {
+                V(wDataMutex);
+            }
+            V(rCountMutex);
+        }
+        ```
+
+*/
 
 
 
