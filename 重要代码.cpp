@@ -6,8 +6,80 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// 智能指针
 
+//深拷贝
+/*
+    A(A &a): m_ptr(new int(a.m_data)) {}
+*/
+
+
+//大小端转换
+/*
+    int a = 0x1234;
+    char c = (char)(a);
+    if(c == 0x12)
+        cout << "big endian" << endl;
+    else if(c == 0x34)
+        cout << "little endian" << endl;
+*/
+
+//异常处理
+/*
+    double m ,n;
+    cin >> m >> n;
+    try {
+        if( n == 0)
+            throw -1; //抛出int类型异常
+        else
+            cout << m / n << endl;
+    }
+    catch(double d) {
+        cout << "catch(double) " << d <<  endl;
+    }
+    catch(int e) {
+        cout << "catch(int) " << e << endl;
+    }
+*/
+
+//比较规范的类代码
+class Complex {
+    private:
+        double real_;
+        double imag_;
+    
+    public:
+        Complex(double real, double imag): real_(real), imag_(imag){}
+        ~Complex(){}
+        const double &getReal() const{return real_;}
+        const double &getImag() const{return imag_;} 
+        Complex operator+(const Complex &a);
+        friend Complex operator-(const Complex &a, const Complex &b);
+        friend ostream& operator<< (ostream &output, const Complex &a);
+        operator double() const; 
+};
+
+inline Complex
+Complex::operator+(const Complex &a) {
+    return Complex(a.real_ + this->real_, a.imag_ + imag_);
+}
+
+Complex operator-(const Complex &a, const Complex &b) {
+    return Complex(a.real_ - b.real_, a.imag_ - b.imag_);
+}
+
+ostream& operator<<(ostream &output, const Complex &a) {
+    output << "real = " << a.real_ << endl;
+    output << "imag = " << a.imag_ << endl;
+    return output;
+}
+
+inline 
+Complex::operator double() const {
+    return this->real_;
+}
+
+
+// 智能指针
 //auto_ptr
 /*
     调用方式
@@ -104,9 +176,17 @@ class shared_ptr {
         }
 };
 
-
-
-
+//不使用额外空间的情况下，交换两个数
+/*
+    - 算数法:浮点型会有精度损失
+        x = x + y;
+        y = x - y;
+        x = x - y;
+    - 异或法:无法交换浮点型
+    　a ^= b; // a=a^b
+    　b ^= a; // b=b^(a^b)=b^a^b=b^b^a=0^a=a
+    　a ^= b; // a=(a^b)^a=a^b^a=a^a^b=0^b=b
+*/
 
 
 
