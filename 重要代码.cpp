@@ -1,16 +1,9 @@
 /*
     记录一些面试中会考到的重要的代码
 */
-
 #include <iostream>
 #include <bits/stdc++.h>
 using namespace std;
-
-
-//深拷贝
-/*
-    A(A &a): m_ptr(new int(a.m_data)) {}
-*/
 
 
 //大小端转换
@@ -22,6 +15,7 @@ using namespace std;
     else if(c == 0x34)
         cout << "little endian" << endl;
 */
+
 
 //异常处理
 /*
@@ -41,6 +35,7 @@ using namespace std;
     }
 */
 
+
 //比较规范的类代码
 class Complex {
     private:
@@ -48,7 +43,9 @@ class Complex {
         double imag_;
     
     public:
-        Complex(double real, double imag): real_(real), imag_(imag){}
+        Complex(double real, double imag): real_(real), imag_(imag){cout << "调用了构造函数" << endl;}
+        Complex(double real): real_(real), imag_(0){cout << "调用了单参数构造函数" << endl;}
+        Complex(const Complex &c);
         ~Complex(){}
         const double &getReal() const{return real_;}
         const double &getImag() const{return imag_;} 
@@ -57,6 +54,13 @@ class Complex {
         friend ostream& operator<< (ostream &output, const Complex &a);
         operator double() const; 
 };
+
+inline 
+Complex::Complex(const Complex &c) {
+    cout << "调用了拷贝构造函数" << endl;
+    this->real_ = c.real_;
+    this->imag_ = c.imag_;
+}
 
 inline Complex
 Complex::operator+(const Complex &a) {
@@ -77,6 +81,44 @@ inline
 Complex::operator double() const {
     return this->real_;
 }
+
+
+//深拷贝，移动构造函数
+/*
+    A a = getA();
+    A(A& a): m_ptr(new int(a.m_data)){} //拷贝构造函数深拷贝,从堆中分配内存，用h.m_data初始化
+    A(A&& a):m_ptr(a.m_ptr){a.m_ptr = nullptr;}
+
+*/
+
+
+//比较大小的函数模板
+template <class T, class U>
+bool compare(T a, U b) {
+    return a > b ? true : false;//不同类型的比较需要重载>
+}
+//模板特例化
+template <>
+bool compare(int, int) {
+    cout << "模板特例化" << endl;
+    return true;
+}
+//部分特例化
+template<class T, class U> 
+class ClassA {
+    T a;
+    U b;
+};
+template<class T, int> 
+class ClassA {
+    
+};
+
+
+
+
+
+
 
 
 // 智能指针
@@ -127,7 +169,6 @@ class auto_ptr {
 };
 
 //unique_ptr
-
 template <class T> 
 class unique_ptr {
     public:
@@ -137,7 +178,6 @@ class unique_ptr {
 };
 
 //shared_ptr
-
 template <class T> 
 class shared_ptr {
     private:
@@ -176,21 +216,6 @@ class shared_ptr {
         }
 };
 
-//不使用额外空间的情况下，交换两个数
-/*
-    - 算数法:浮点型会有精度损失
-        x = x + y;
-        y = x - y;
-        x = x - y;
-    - 异或法:无法交换浮点型
-    　a ^= b; // a=a^b
-    　b ^= a; // b=b^(a^b)=b^a^b=b^b^a=0^a=a
-    　a ^= b; // a=(a^b)^a=a^b^a=a^a^b=0^b=b
-*/
-
-
-
-
 
 //冒泡排序
 void bubbleSort(vector<int> &vec) {
@@ -221,7 +246,6 @@ void selectionSort(vector<int> &vec) {
     }
 }
 
-
 //插入排序
 void insertSort(vector<int> &vec) {
     int n = vec.size() - 1;
@@ -245,7 +269,6 @@ void shellSort(vector<int> &vec) {
         }
     }
 }
-
 
 //归并排序
 void merge(int *arr, int n) {
@@ -407,44 +430,7 @@ void radixSort(vector<int> &vec) {
 }
 
 
-
-
-//n进制转10进制
-int ntoi(string &str, int radix) {
-    int ans = 0;
-    for(int i = 0; i < str.size(); ++i) {
-        char ch = str[i];
-        if(ch >= '0' && ch <= '9') {
-            ans = ans * radix + ch - '0'; 
-        }else {
-            ans = ans * radix + ch - 'a' + 10;
-        }
-    }
-    return ans;
-}
-
-//10进制转n进制
-string iton(int n, int radix) {
-    string ans;
-    do {
-        int t = n % radix;
-        if(t >= 0 && t <= 9) {
-            ans += t + '0';
-        }else {
-            ans += t - 10 + 'a';
-        }
-        n /= radix;
-    }while(n != 0);//一开始n==0的情况也要计算,还有要记得加';'
-    reverse(ans.begin(), ans.end());
-    return ans;
-}
-
-
-
-
-
 //LRU算法
-
 struct DLinkedNode {
     int key, value;
     DLinkedNode *prev;
@@ -610,8 +596,48 @@ class LRUCache {
 */
 
 
+//n进制转10进制
+int ntoi(string &str, int radix) {
+    int ans = 0;
+    for(int i = 0; i < str.size(); ++i) {
+        char ch = str[i];
+        if(ch >= '0' && ch <= '9') {
+            ans = ans * radix + ch - '0'; 
+        }else {
+            ans = ans * radix + ch - 'a' + 10;
+        }
+    }
+    return ans;
+}
+
+//10进制转n进制
+string iton(int n, int radix) {
+    string ans;
+    do {
+        int t = n % radix;
+        if(t >= 0 && t <= 9) {
+            ans += t + '0';
+        }else {
+            ans += t - 10 + 'a';
+        }
+        n /= radix;
+    }while(n != 0);//一开始n==0的情况也要计算,还有要记得加';'
+    reverse(ans.begin(), ans.end());
+    return ans;
+}
 
 
+//不使用额外空间的情况下，交换两个数
+/*
+    - 算数法:浮点型会有精度损失
+        x = x + y;
+        y = x - y;
+        x = x - y;
+    - 异或法:无法交换浮点型
+    　a ^= b; // a=a^b
+    　b ^= a; // b=b^(a^b)=b^a^b=b^b^a=0^a=a
+    　a ^= b; // a=(a^b)^a=a^b^a=a^a^b=0^b=b
+*/
 
 
 
@@ -664,5 +690,5 @@ int main() {
     // cout << iton(n, 2) << endl;
     // cout << "0x" + iton(n, 16) << endl;
 
-
+    cout << compare<int, int>(1, 2) << endl;
 }

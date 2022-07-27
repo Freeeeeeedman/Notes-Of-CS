@@ -60,6 +60,50 @@ public:
 };
  
 
+
+class Man {
+    public:
+    Man(){
+        cout << "call Man::Man()" << endl;
+    }
+    Man(string n, int a):name(n),age(a) {
+        cout << "call Man::Man(string, int)" << endl;
+    }
+    Man(const Man& a) {
+        cout << "call Man::Man(const Man&)" << endl;
+    }
+    Man& operator=(const Man& a) {
+        name = a.name;
+        age = a.age;
+        cout << "call Man::operator=(const Man& a)" << endl;
+        return *this;
+    }
+    private:
+    string  name;
+    int   age;
+};
+
+// class ChineseMan {
+//     public:
+//     ChineseMan(Man a, string i) {
+//         man = a;
+//         id = i;
+//     }
+//     private:
+//     string  id;
+//     Man   man;
+// };
+
+class ChineseMan {
+public:
+  ChineseMan(Man a, string i):man(a), id(i) {}
+private:
+  string  id;
+  Man   man;
+};
+
+
+
 int main() {
     // Cat c;
     // Animal *a = &c;
@@ -70,9 +114,11 @@ int main() {
     // x.showA();
     // int a = tmpValue();
     // cout << a << endl;
-    Person p;
-    p = 1000; 
+    // Person p;
+    // p = 1000; 
 
-    // Person per = 1000;
+    Man vincent("vincent", 26);
+    cout << "-----------" << endl;
+    ChineseMan vincent_CN(vincent, "001");
     return 0;
 }
