@@ -109,16 +109,26 @@ class ClassA {
     T a;
     U b;
 };
-template<class T, int> 
-class ClassA {
+template<class T> 
+class ClassA<T, int> {
     
 };
 
 
+//placement new
+class Foo {
+    public:
+        int x;
+        double y;
+        ~Foo() {cout << "调用析构函数" << endl;}
 
+};
 
-
-
+//仿函数
+/*
+int a = 0, b = 1;
+auto f1 = [a, b] {return a + b;}
+*/
 
 
 // 智能指针
@@ -690,5 +700,13 @@ int main() {
     // cout << iton(n, 2) << endl;
     // cout << "0x" + iton(n, 16) << endl;
 
-    cout << compare<int, int>(1, 2) << endl;
+    // cout << compare<int, int>(1, 2) << endl;
+    
+    // Foo foo;
+    // char *buff = new char[sizeof(foo) * 5];
+    // memset(buff, 0, sizeof(foo) * 5);
+    // Foo *p = new(buff) Foo;
+    // p->~Foo();
+    // delete []buff;
+     
 }
