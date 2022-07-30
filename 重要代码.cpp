@@ -126,9 +126,62 @@ class Foo {
 
 //仿函数
 /*
-int a = 0, b = 1;
-auto f1 = [a, b] {return a + b;}
+    int a = 0, b = 1;
+    auto f1 = [a, b] {return a + b;}
 */
+
+//移动构造函数
+/*
+    A(A &&a){
+        pdata = a.pdata;
+        a.pdata = nullptr;
+    }
+*/
+
+//移动赋值运算符
+/*
+    A &operator=(A &&a) {
+        if(this != &a) { //避免 a = move(a);
+            delete []pdata;
+            pdata = a.pdata;
+            a.pdata = nullptr;
+        }
+        return *this;
+}
+*/
+
+//move()实现
+/*
+    template <typename T> 
+    typename remove_reference<T>::type&& move(T&& t) {
+        return static_cast<typename remove_reference<T>::type&&>(t);
+    }
+*/
+
+//swap()优化
+/*
+    template<class T>
+    void swap(T &a, T &b) {
+        T temp = move(a);
+        a = move(b);
+        b = move(temp);
+    }
+*/
+
+//forward()实现
+/*
+    template <class T>
+    T&& forward(typename remove_reference<T>::type &t) {
+        return static_cast<T&&>(t);
+    }
+
+    template <class T>
+    T&& forward(typename remove_reference<T>::type &&t)  {
+        return static_cast<T&&>(t);
+    }
+
+*/
+
 
 
 // 智能指针
@@ -144,7 +197,7 @@ class auto_ptr {
     private:
         T *_ptr;
     public:
-        auto_ptr(T *ptr = nullptr):_ptr(ptr) {}
+        explicit auto_ptr(T *ptr = nullptr):_ptr(ptr) {}
         
         ~auto_ptr() {
             if(_ptr != nullptr) {
@@ -182,9 +235,11 @@ class auto_ptr {
 template <class T> 
 class unique_ptr {
     public:
-        //禁止拷贝与赋值
+        //禁止拷贝与赋值，支持移动构造和移动赋值
         unique_ptr(unique_ptr<T> &up) = delete;
         unique_ptr<T> &operator=(unique_ptr<T> &up) = delete;
+        unique_ptr(unique_ptr<T> &&up);
+        unique_ptr<T> &operator=(unique_ptr<T> &&up);
 };
 
 //shared_ptr
@@ -206,7 +261,7 @@ class shared_ptr {
             }
         }
 
-        //拷贝
+        //拷贝，使得所有指向相同堆内存的智能指针拥有相同的_pcount变量
         shared_ptr(shared_ptr<T> &sp):_ptr(sp._ptr), _pcount(sp._pcount) {
             ++(*_pcount);
         }
