@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <string>
 using namespace std;
 
 class Animal {
@@ -117,8 +117,15 @@ int main() {
     // Person p;
     // p = 1000; 
 
-    Man vincent("vincent", 26);
-    cout << "-----------" << endl;
-    ChineseMan vincent_CN(vincent, "001");
-    return 0;
+    // Man vincent("vincent", 26);
+    // cout << "-----------" << endl;
+    // ChineseMan vincent_CN(vincent, "001");
+
+
+    char *cstr = "abc";
+    string str(cstr);
+    cout << "str = " << str << endl;
+    const char *cstr_ = str.c_str();
+    cout << "cstr_ = " << cstr_ <<endl;
+
 }
