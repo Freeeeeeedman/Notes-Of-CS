@@ -182,6 +182,38 @@ class Foo {
 
 */
 
+//traits实现
+template<class T>
+struct traits {
+    typedef typename T::value_type value_type;
+};
+template<class T>
+struct traits<T *> {
+    typedef T value_type;
+};
+void fun(int a) {
+    cout << "fun(int) is called" << endl;
+}
+void fun(double a) {
+    cout << "fun(double) is called" << endl;
+}
+void fun(char a) {
+    cout << "fun(char) is called" << endl;
+}
+
+//前置++与后置++重载
+/*
+int& operator++(){
+    *this += 1;
+    return *this;
+}
+
+int operator++(int){//有参数仅仅是为了区分前置与后置，实际中没有被使用
+    int temp = *this;                   
+    ++*this;                       
+    return temp;                  
+}
+*/
 
 
 // 智能指针
@@ -763,5 +795,11 @@ int main() {
     // Foo *p = new(buff) Foo;
     // p->~Foo();
     // delete []buff;
-     
+
+    traits<vector<int>::iterator>::value_type a;
+    fun(a);
+    traits<vector<double>::iterator>::value_type b;
+    fun(b);
+    traits<char*>::value_type c;
+    fun(c);    
 }
