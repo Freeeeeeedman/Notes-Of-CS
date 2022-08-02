@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <bits/stdc++.h>
 using namespace std;
 
 class Animal {
@@ -122,10 +123,12 @@ int main() {
     // ChineseMan vincent_CN(vincent, "001");
 
 
-    char *cstr = "abc";
-    string str(cstr);
-    cout << "str = " << str << endl;
-    const char *cstr_ = str.c_str();
-    cout << "cstr_ = " << cstr_ <<endl;
+    // char *cstr = "abc";
+    // string str(cstr);
+    // cout << "str = " << str << endl;
+    // const char *cstr_ = str.c_str();
+    // cout << "cstr_ = " << cstr_ <<endl;
 
+    unordered_set<int> uset = {0, 1, 1, 3, 4}; 
+    cout << static_cast<int> (uset.find(2) != uset.end()) << endl;
 }
