@@ -1,24 +1,12 @@
 #include <iostream>
-#include "student.h"
+#include <string>
+#include <bits/stdc++.h>
 using namespace std;
 
-class Base
-{
-public:
-    void fun(int a){
-        cout << "call in Base Fun";
-    }
-};
 
-class Derived : public Base
-{
-public:
-    // using Base::fun;
-};
-
-int main()
-{
-    Derived d1;
-    d1.fun(4);
-    return 0;
+int main() {
+    set<int> st;
+    st.insert(1);
+    st.insert(2);
+    cout << int(st.find(123) != st.end()) << endl;
 }
