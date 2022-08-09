@@ -5,8 +5,8 @@ using namespace std;
 
 
 int main() {
-    set<int> st;
-    st.insert(1);
-    st.insert(2);
-    cout << int(st.find(123) != st.end()) << endl;
+    vector<int> vec {1, 2, 3, 4, 5};
+    for(int i = 0, j = vec.size() - 1; i < vec.size(), j >= 0; ++i, --j) {
+        cout << vec[i] << " " << vec[j] << endl;
+    }
 }
