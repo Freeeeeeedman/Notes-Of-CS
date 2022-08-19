@@ -832,6 +832,42 @@
             return 0;
         }
         ```
+14. switch的使用
+    - 必须要有break，否则会继续指向
+    ```
+    int main() {
+        int a = 1;
+        switch (a)
+        {
+        case 1: a++; 
+        case 2: a++; break;
+        default: a++; cout << "default" << endl; 
+        }
+        cout << a << endl;
+        return 0;
+    }
+
+    ```
+15. while内自增
+    - n--:先执行判断语句，再--，最后执行while中的语句
+    - --n:先--，再执行判断语句，最后执行while中的语句
+        ```
+        //结果是4, 3, 2, 1, 0。一共循环5次
+        int main() {
+            int n = 5;
+            while(n--) {
+                cout << n << endl;        
+            }
+        }
+
+        //结果是4, 3, 2, 1。一共循环4次
+        int main() {
+            int n = 5;
+            while(--n) {
+                cout << n << endl;        
+            }
+        }
+        ```
 ### 2. C++面向对象
 #### 2.1 面向对象
 1. 介绍面向对象的三大特性，并且举例说明

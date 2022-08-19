@@ -1,7 +1,10 @@
-#include <iostream>
-#include "hello.h"
+#include<iostream>
 using namespace std;
 
 int main() {
-    hello();
+    int n = 5;
+    while(n--) {
+        cout << n << endl;
+        
+    }
 }
