@@ -17,6 +17,8 @@
    124.221.163.97
    10.0.16.15
 
+**到时候自己创造几个问题再通过工具分析一下**
+**export OMP_NUM_THREADS=1 &&  python test.py**
 
 ### 面试思路
 1. 关于项目，主要想清楚这几个问题：
@@ -84,7 +86,10 @@
    先查看后台服务器的运行状态，包括磁盘，CPU，内存的使用情况等（top，free）。如果是磁盘满了，做好备份，清理下磁盘；如果是CPU的问题，查找下占用率较高的进程，kill掉与系统应用无关的进程。还有一种情况可能是close_wait或者time_wait状态过多了，消耗了服务器的资源，使用netstat命令查看下网络连接的状态。
 12. webserver有没有做负载均衡，反向代理等等
 13. 怎么还有问和nginx比提升在哪里
-
+14. 如何排查网络问题？
+   网络：ifconfig看网络配置，netstat查看socket信息，sar历史数据统计工具（网络IO内存）， tcmdump抓包给wireshark分析，traceroute排查网络问题
+CPU/内存：dmidecode看硬件信息，top/htop/ps看进程CPU占用，vmstat（虚拟内存统计CPU内存IO），还有strace分析进程的系统调用情况，pmap进程的内存映像信息
+15. 这台电脑的性能瓶颈在哪
 #### 项目遇到的问题（测试时有没有产生什么问题？）
 1. 测试高并发的时候发现有一些连接丢失
    原因：socketfd使用ET触发模式，但是没有用while来循环accept()导致有些连接丢失（通过netstat查看全连接队列发现没有被取出）
