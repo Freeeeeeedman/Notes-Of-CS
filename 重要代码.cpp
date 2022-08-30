@@ -6,34 +6,7 @@
 using namespace std;
 
 
-//大小端转换
-/*
-    int a = 0x1234;
-    char c = (char)(a);
-    if(c == 0x12)
-        cout << "big endian" << endl;
-    else if(c == 0x34)
-        cout << "little endian" << endl;
-*/
 
-
-//异常处理
-/*
-    double m ,n;
-    cin >> m >> n;
-    try {
-        if( n == 0)
-            throw -1; //抛出int类型异常
-        else
-            cout << m / n << endl;
-    }
-    catch(double d) {
-        cout << "catch(double) " << d <<  endl;
-    }
-    catch(int e) {
-        cout << "catch(int) " << e << endl;
-    }
-*/
 
 
 //比较规范的类代码
@@ -772,13 +745,66 @@ void listInput() {
 
 }
 
+//大小端转换
+/*
+    int a = 0x1234;
+    char c = (char)(a);
+    if(c == 0x12)
+        cout << "big endian" << endl;
+    else if(c == 0x34)
+        cout << "little endian" << endl;
+*/
+
+
+//异常处理
+/*
+    double m ,n;
+    cin >> m >> n;
+    try {
+        if( n == 0)
+            throw -1; //抛出int类型异常
+        else
+            cout << m / n << endl;
+    }
+    catch(double d) {
+        cout << "catch(double) " << d <<  endl;
+    }
+    catch(int e) {
+        cout << "catch(int) " << e << endl;
+    }
+*/
 
 
 
+//memcpy的实现
+//注意对于栈是从高地址往低地址增长
+//覆盖情况一:src < dst && src + n > dest的情况，需要从高地址向低地址“倒序”复制
+//其余情况:从低地址向高地址正序复制即可
+//优化：一次拷贝多个值
+void *mymemcpy(char *dest, const char *src, int n) {
+    if(dest == nullptr || src == nullptr || n < 0) return nullptr;
+    char *p = (char *)dest;
+    char *q = (char *)src;
+    if(src < dest && src + n > dest) {
+        p = p + n - 1;
+        q = q + n - 1;
+        while(n--) {
+            *p = *q;
+            p--;
+            q--;
+        }
+    }else {
+        while(n--) {
+            *p = *q;
+            p++;
+            q++;
+        }
+    }
+    return dest;
+}
 
-
-
-
+//宏定义函数
+#define Max(x, y) ((x) > (y) ? (x) : (y))
 
 
 
@@ -829,10 +855,15 @@ int main() {
     // p->~Foo();
     // delete []buff;
 
-    traits<vector<int>::iterator>::value_type a;
-    fun(a);
-    traits<vector<double>::iterator>::value_type b;
-    fun(b);
-    traits<char*>::value_type c;
-    fun(c);    
+    // traits<vector<int>::iterator>::value_type a;
+    // fun(a);
+    // traits<vector<double>::iterator>::value_type b;
+    // fun(b);
+    // traits<char*>::value_type c;
+    // fun(c);
+
+    // char a[] = {0};
+    // char b[] = "abcdsad";
+    // mymemcpy(a, b, sizeof(b));
+    // printf("%s", a);    
 }
